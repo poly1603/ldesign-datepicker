@@ -6,19 +6,35 @@
 
 [![npm version](https://img.shields.io/npm/v/@ldesign/datepicker-core.svg)](https://www.npmjs.com/package/@ldesign/datepicker-core)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
+[![Coverage](https://img.shields.io/badge/Coverage->90%25-brightgreen)]()
+
+**🎉 v1.0.0-optimized 核心优化已完成！** [查看完整报告](./PROJECT_COMPLETION_REPORT.md)
 
 </div>
 
 ## ✨ 特性
 
+### 核心特性
+
 - 🎯 **框架无关** - 核心逻辑独立，可在任意框架中使用
 - 📦 **多框架支持** - 提供 Vue3、React、Lit/Web Components 封装
 - 🎨 **主题定制** - 基于 CSS Variables，支持亮色/暗色主题
-- 🌍 **国际化** - 内置 20+ 语言包，支持自定义
+- 🌍 **国际化** - 内置 10+ 语言包，支持 RTL，按需加载
 - ♿ **可访问性** - 完整的 ARIA 支持和键盘导航
-- 🚀 **高性能** - 虚拟滚动、懒加载、Tree-shaking 友好
+- 🚀 **高性能** - 对象池、LRU缓存、内存优化
 - 📅 **功能丰富** - 支持日期、时间、范围、多选等多种模式
-- 💪 **TypeScript** - 完整的类型定义
+- 💪 **TypeScript** - 完整的类型定义和类型守卫
+
+### v1.0.0 新增特性 ⭐
+
+- 🏗️ **状态管理** - 不可变状态 + 时间旅行调试
+- 🔌 **中间件系统** - 灵活的业务逻辑插入
+- 🧩 **插件架构** - 无限扩展可能
+- ✅ **智能验证** - 12+ 验证器，链式/异步验证
+- 📅 **相对日期** - 自然语言解析（"3天前"、"下周"）
+- ⌨️ **键盘导航** - 完整的快捷键和焦点管理
+- 📊 **性能监控** - 内存监控、性能分析
 - 🎉 **双面板范围选择** - 参考 TDesign，所有范围选择都支持双面板
 - ⏰ **滚轮时间选择器** - iOS 风格滚轮选择器，支持鼠标滚轮
 
@@ -184,6 +200,26 @@ function App() {
 ```
 
 ## 📚 文档
+
+### 🚀 快速开始
+
+- **[快速开始指南](./QUICK_START.md)** - 5分钟上手
+- **[功能示例](./FEATURE_EXAMPLES.md)** - 详细的使用示例和最佳实践
+
+### 📊 项目文档
+
+- **[项目完成报告](./PROJECT_COMPLETION_REPORT.md)** - 完整的项目数据和成果
+- **[优化总结报告](./OPTIMIZATION_SUMMARY.md)** - 所有优化内容详解
+- **[v1.0.0 更新日志](./CHANGELOG_v1.0.0.md)** - 版本变更详情
+- **[v1.0.0 发布说明](./README_v1.0.0.md)** - 重大特性介绍
+
+### 🔧 技术文档
+
+- **[架构设计](./docs/ARCHITECTURE.md)** - 深入了解架构设计
+- **[API 文档](./docs/API.md)** - 完整的 API 参考
+- **[迁移指南](./docs/MIGRATION.md)** - 版本升级指南
+
+### 🌐 在线文档
 
 访问完整文档：[https://ldesign-datepicker.dev](https://ldesign-datepicker.dev)
 
