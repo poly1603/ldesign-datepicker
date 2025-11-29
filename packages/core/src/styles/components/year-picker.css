@@ -1,0 +1,30 @@
+/**
+ * 年份选择器样式
+ */
+
+.ldp-year-picker {
+  width: 280px;
+  padding: var(--ldp-spacing-sm);
+}
+
+/* 面板 */
+.ldp-year-picker__panel {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--ldp-spacing-sm);
+  padding: var(--ldp-spacing-sm) 0;
+}
+
+.ldp-year-picker__cell {
+  width: 100%;
+  height: 40px;
+}
+
+.ldp-year-picker__cell--current {
+  border: 1px solid var(--ldp-primary);
+}
+
+.ldp-year-picker__cell--out-of-range {
+  color: var(--ldp-text-disabled);
+  cursor: not-allowed;
+}

@@ -1,0 +1,250 @@
+/**
+ * 日期时间范围选择器样式
+ */
+
+.ldp-datetimerange-picker {
+  background: var(--ldp-bg-primary);
+  border-radius: var(--ldp-border-radius);
+}
+
+.ldp-datetimerange-picker__content {
+  display: flex;
+}
+
+.ldp-datetimerange-picker__panel {
+  padding: 12px;
+  min-width: 260px;
+}
+
+.ldp-datetimerange-picker__divider {
+  width: 1px;
+  background: var(--ldp-border-color);
+}
+
+.ldp-datetimerange-picker__panel-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ldp-text-secondary);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.ldp-datetimerange-picker__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.ldp-datetimerange-picker__nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--ldp-text-secondary);
+  cursor: pointer;
+  border-radius: var(--ldp-border-radius-sm);
+  font-size: 18px;
+  transition: all 0.15s;
+}
+
+.ldp-datetimerange-picker__nav-btn:hover {
+  background: var(--ldp-bg-hover);
+  color: var(--ldp-primary);
+}
+
+.ldp-datetimerange-picker__date-title {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.ldp-datetimerange-picker__week-header {
+  display: flex;
+  margin-bottom: 4px;
+}
+
+.ldp-datetimerange-picker__week-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 24px;
+  font-size: 12px;
+  color: var(--ldp-text-secondary);
+}
+
+.ldp-datetimerange-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 32px);
+  gap: 2px;
+  margin-bottom: 12px;
+}
+
+.ldp-datetimerange-picker__cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: var(--ldp-border-radius-sm);
+  transition: all 0.15s;
+}
+
+.ldp-datetimerange-picker__cell:hover:not(.ldp-datetimerange-picker__cell--disabled) {
+  background: var(--ldp-bg-hover);
+}
+
+.ldp-datetimerange-picker__cell--today {
+  border: 1px solid var(--ldp-primary);
+}
+
+.ldp-datetimerange-picker__cell--start,
+.ldp-datetimerange-picker__cell--end {
+  background: var(--ldp-primary) !important;
+  color: #fff;
+}
+
+.ldp-datetimerange-picker__cell--in-range,
+.ldp-datetimerange-picker__cell--in-hover-range {
+  background: var(--ldp-primary-bg);
+}
+
+.ldp-datetimerange-picker__cell--other-month {
+  color: var(--ldp-text-disabled);
+}
+
+.ldp-datetimerange-picker__cell--disabled {
+  color: var(--ldp-text-disabled);
+  cursor: not-allowed;
+}
+
+/* 时间选择 */
+.ldp-datetimerange-picker__time {
+  border-top: 1px solid var(--ldp-border-color);
+  padding-top: 8px;
+}
+
+.ldp-datetimerange-picker__time-display {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ldp-primary);
+  padding: 6px;
+  background: var(--ldp-primary-bg);
+  border-radius: var(--ldp-border-radius-sm);
+  margin-bottom: 8px;
+}
+
+.ldp-datetimerange-picker__time-wheel {
+  position: relative;
+  height: 112px;
+  overflow: hidden;
+}
+
+.ldp-datetimerange-picker__time-indicator {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 50%;
+  height: 28px;
+  transform: translateY(-50%);
+  background: var(--ldp-primary-bg);
+  border-radius: var(--ldp-border-radius-sm);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ldp-datetimerange-picker__time-columns {
+  display: flex;
+  height: 100%;
+}
+
+.ldp-datetimerange-picker__time-column {
+  flex: 1;
+  overflow: hidden;
+  cursor: ns-resize;
+}
+
+.ldp-datetimerange-picker__time-wrapper {
+  padding-top: 42px;
+}
+
+.ldp-datetimerange-picker__time-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  font-size: 14px;
+  color: var(--ldp-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.ldp-datetimerange-picker__time-item:hover:not(.ldp-datetimerange-picker__time-item--placeholder) {
+  color: var(--ldp-primary);
+}
+
+.ldp-datetimerange-picker__time-item--selected {
+  color: var(--ldp-primary);
+  font-weight: 600;
+}
+
+.ldp-datetimerange-picker__time-item--placeholder {
+  visibility: hidden;
+}
+
+/* 底部 */
+.ldp-datetimerange-picker__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-top: 1px solid var(--ldp-border-color);
+}
+
+.ldp-datetimerange-picker__info {
+  font-size: 13px;
+  color: var(--ldp-text-secondary);
+}
+
+.ldp-datetimerange-picker__buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.ldp-datetimerange-picker__clear-btn {
+  padding: 6px 12px;
+  border: 1px solid var(--ldp-border-color);
+  background: var(--ldp-bg-primary);
+  color: var(--ldp-text-secondary);
+  border-radius: var(--ldp-border-radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.15s;
+}
+
+.ldp-datetimerange-picker__clear-btn:hover {
+  border-color: var(--ldp-primary);
+  color: var(--ldp-primary);
+}
+
+.ldp-datetimerange-picker__confirm-btn {
+  padding: 6px 16px;
+  border: none;
+  background: var(--ldp-primary);
+  color: #fff;
+  border-radius: var(--ldp-border-radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.15s;
+}
+
+.ldp-datetimerange-picker__confirm-btn:hover {
+  background: var(--ldp-primary-hover);
+}

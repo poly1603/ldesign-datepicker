@@ -1,0 +1,134 @@
+/**
+ * 星期选择器样式
+ */
+
+.ldp-week-picker {
+  width: 320px;
+  padding: var(--ldp-spacing-sm);
+}
+
+/* 头部 */
+.ldp-week-picker__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--ldp-header-height);
+  margin-bottom: var(--ldp-spacing-xs);
+  border-bottom: none;
+}
+
+.ldp-week-picker__title {
+  display: flex;
+  gap: var(--ldp-spacing-xs);
+}
+
+.ldp-week-picker__year,
+.ldp-week-picker__month {
+  font-weight: 500;
+}
+
+/* 星期头部 */
+.ldp-week-picker__week-header {
+  display: flex;
+  border-bottom: 1px solid var(--ldp-border-color);
+  padding-bottom: var(--ldp-spacing-xs);
+  margin-bottom: var(--ldp-spacing-xs);
+}
+
+.ldp-week-picker__week-number-header,
+.ldp-week-picker__week-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ldp-cell-size);
+  height: 24px;
+  font-size: var(--ldp-font-size-sm);
+  color: var(--ldp-text-secondary);
+}
+
+.ldp-week-picker__week-number-header {
+  width: 40px;
+}
+
+.ldp-week-picker__week-day--weekend {
+  color: var(--ldp-primary);
+}
+
+/* 面板 */
+.ldp-week-picker__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* 周行 */
+.ldp-week-picker__week-row {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border-radius: var(--ldp-border-radius-sm);
+  transition: all var(--ldp-transition-fast);
+}
+
+.ldp-week-picker__week-row:hover:not(.ldp-week-picker__week-row--disabled) {
+  background: var(--ldp-bg-hover);
+}
+
+.ldp-week-picker__week-row--selected {
+  background: var(--ldp-primary-bg) !important;
+}
+
+.ldp-week-picker__week-row--selected .ldp-week-picker__cell {
+  color: var(--ldp-primary);
+}
+
+.ldp-week-picker__week-row--current .ldp-week-picker__week-number {
+  color: var(--ldp-primary);
+  font-weight: 500;
+}
+
+.ldp-week-picker__week-row--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 周数 */
+.ldp-week-picker__week-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: var(--ldp-cell-size);
+  font-size: var(--ldp-font-size-sm);
+  color: var(--ldp-text-disabled);
+}
+
+/* 单元格 */
+.ldp-week-picker__cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ldp-cell-size);
+  height: var(--ldp-cell-size);
+  font-size: var(--ldp-font-size);
+}
+
+.ldp-week-picker__cell--other-month {
+  color: var(--ldp-text-disabled);
+}
+
+.ldp-week-picker__cell--today {
+  font-weight: 600;
+  color: var(--ldp-primary);
+}
+
+.ldp-week-picker__cell--weekend {
+  color: var(--ldp-primary);
+}
+
+/* 底部 */
+.ldp-week-picker__footer {
+  margin-top: var(--ldp-spacing-sm);
+  padding-top: var(--ldp-spacing-sm);
+  border-top: 1px solid var(--ldp-border-color);
+}

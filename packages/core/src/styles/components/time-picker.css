@@ -1,0 +1,151 @@
+/**
+ * 时间选择器样式 - 滚轮选择器效果
+ */
+
+.ldp-time-picker {
+  width: 240px;
+  background: var(--ldp-bg-primary);
+  border-radius: var(--ldp-border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--ldp-shadow);
+  padding: 12px 8px;
+}
+
+.ldp-time-picker__panel {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+  border-radius: var(--ldp-border-radius);
+  background: var(--ldp-bg-secondary);
+}
+
+/* 选中指示器 - 中间高亮区域 */
+.ldp-time-picker__indicator {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 50%;
+  height: 40px;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, var(--ldp-primary-bg) 0%, rgba(24, 144, 255, 0.15) 100%);
+  border-radius: var(--ldp-border-radius);
+  pointer-events: none;
+  z-index: 1;
+  border: 2px solid var(--ldp-primary);
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+}
+
+/* 渐变遮罩 */
+.ldp-time-picker__mask {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 80px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.ldp-time-picker__mask--top {
+  top: 0;
+  background: linear-gradient(to bottom, var(--ldp-bg-secondary) 20%, transparent 100%);
+}
+
+.ldp-time-picker__mask--bottom {
+  bottom: 0;
+  background: linear-gradient(to top, var(--ldp-bg-secondary) 20%, transparent 100%);
+}
+
+/* 时间列容器 */
+.ldp-time-picker__columns {
+  display: flex;
+  height: 100%;
+  padding: 0 8px;
+}
+
+.ldp-time-picker__column {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  cursor: ns-resize;
+}
+
+.ldp-time-picker__wrapper {
+  padding-top: 80px;
+  /* (200 - 40) / 2 */
+}
+
+/* 时间选项 */
+.ldp-time-picker__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--ldp-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
+}
+
+.ldp-time-picker__item:hover:not(.ldp-time-picker__item--placeholder):not(.ldp-time-picker__item--disabled) {
+  color: var(--ldp-primary);
+  transform: scale(1.05);
+}
+
+.ldp-time-picker__item--selected {
+  color: var(--ldp-primary);
+  font-weight: 700;
+  font-size: 20px;
+  text-shadow: 0 1px 2px rgba(24, 144, 255, 0.2);
+}
+
+.ldp-time-picker__item--disabled {
+  color: var(--ldp-text-disabled);
+  cursor: not-allowed;
+}
+
+.ldp-time-picker__item--placeholder {
+  visibility: hidden;
+}
+
+/* 底部按钮 */
+.ldp-time-picker__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--ldp-spacing-sm);
+  padding: var(--ldp-spacing-sm);
+  border-top: 1px solid var(--ldp-border-color);
+}
+
+.ldp-time-picker__now-btn {
+  padding: 6px 16px;
+  border: 1px solid var(--ldp-border-color);
+  background: var(--ldp-bg-primary);
+  color: var(--ldp-text-secondary);
+  border-radius: var(--ldp-border-radius-sm);
+  cursor: pointer;
+  transition: all var(--ldp-transition-fast);
+  font-size: 14px;
+}
+
+.ldp-time-picker__now-btn:hover {
+  border-color: var(--ldp-primary);
+  color: var(--ldp-primary);
+}
+
+.ldp-time-picker__confirm-btn {
+  padding: 6px 20px;
+  border: none;
+  background: var(--ldp-primary);
+  color: #fff;
+  border-radius: var(--ldp-border-radius-sm);
+  cursor: pointer;
+  transition: all var(--ldp-transition-fast);
+  font-size: 14px;
+}
+
+.ldp-time-picker__confirm-btn:hover {
+  background: var(--ldp-primary-hover);
+}

@@ -1,0 +1,271 @@
+/**
+ * 日期时间选择器样式 - 左右布局
+ */
+
+.ldp-datetime-picker {
+  background: var(--ldp-bg-primary);
+  border-radius: var(--ldp-border-radius-lg);
+  overflow: hidden;
+}
+
+/* 主内容区 - 左右布局 */
+.ldp-datetime-picker__content {
+  display: flex;
+}
+
+/* 左侧日期区 */
+.ldp-datetime-picker__left {
+  padding: 12px;
+}
+
+/* 分隔线 */
+.ldp-datetime-picker__divider {
+  width: 1px;
+  background: var(--ldp-border-color);
+}
+
+/* 右侧时间区 */
+.ldp-datetime-picker__right {
+  padding: 12px;
+  width: 120px;
+}
+
+/* 日期头部导航 */
+.ldp-datetime-picker__date-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.ldp-datetime-picker__nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--ldp-text-secondary);
+  cursor: pointer;
+  border-radius: var(--ldp-border-radius-sm);
+  font-size: 18px;
+  transition: all 0.15s;
+}
+
+.ldp-datetime-picker__nav-btn:hover {
+  background: var(--ldp-bg-hover);
+  color: var(--ldp-primary);
+}
+
+.ldp-datetime-picker__date-title {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* 日期面板 */
+.ldp-datetime-picker__date-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 星期头部 */
+.ldp-datetime-picker__week-header {
+  display: flex;
+  margin-bottom: 4px;
+}
+
+.ldp-datetime-picker__week-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 24px;
+  font-size: 12px;
+  color: var(--ldp-text-secondary);
+}
+
+/* 日期网格 */
+.ldp-datetime-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 32px);
+  gap: 2px;
+}
+
+/* 日期单元格 */
+.ldp-datetime-picker__cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: var(--ldp-border-radius-sm);
+  transition: all 0.15s;
+}
+
+.ldp-datetime-picker__cell:hover:not(.ldp-datetime-picker__cell--disabled) {
+  background: var(--ldp-bg-hover);
+}
+
+.ldp-datetime-picker__cell--today {
+  border: 1px solid var(--ldp-primary);
+}
+
+.ldp-datetime-picker__cell--selected {
+  background: var(--ldp-primary) !important;
+  color: #fff;
+}
+
+.ldp-datetime-picker__cell--other-month {
+  color: var(--ldp-text-disabled);
+}
+
+.ldp-datetime-picker__cell--disabled {
+  color: var(--ldp-text-disabled);
+  cursor: not-allowed;
+}
+
+/* 时间面板 */
+.ldp-datetime-picker__time-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.ldp-datetime-picker__time-display {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 12px;
+  padding: 10px 8px;
+  background: linear-gradient(135deg, var(--ldp-primary) 0%, var(--ldp-primary-hover) 100%);
+  border-radius: var(--ldp-border-radius);
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+}
+
+/* 时间滚轮容器 */
+.ldp-datetime-picker__time-wheel {
+  position: relative;
+  height: 160px;
+  overflow: hidden;
+}
+
+/* 选中指示器 */
+.ldp-datetime-picker__time-indicator {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 50%;
+  height: 34px;
+  transform: translateY(-50%);
+  background: rgba(24, 144, 255, 0.1);
+  border: 2px solid var(--ldp-primary);
+  border-radius: var(--ldp-border-radius);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 渐变遮罩 */
+.ldp-datetime-picker__time-mask {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 64px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.ldp-datetime-picker__time-mask--top {
+  top: 0;
+  background: linear-gradient(to bottom, var(--ldp-bg-primary) 0%, transparent 100%);
+}
+
+.ldp-datetime-picker__time-mask--bottom {
+  bottom: 0;
+  background: linear-gradient(to top, var(--ldp-bg-primary) 0%, transparent 100%);
+}
+
+/* 时间列 */
+.ldp-datetime-picker__time-columns {
+  display: flex;
+  height: 100%;
+}
+
+.ldp-datetime-picker__time-column {
+  flex: 1;
+  overflow: hidden;
+  cursor: ns-resize;
+}
+
+.ldp-datetime-picker__time-wrapper {
+  padding-top: 64px;
+}
+
+.ldp-datetime-picker__time-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  font-size: 15px;
+  color: var(--ldp-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.ldp-datetime-picker__time-item:hover:not(.ldp-datetime-picker__time-item--placeholder) {
+  color: var(--ldp-primary);
+}
+
+.ldp-datetime-picker__time-item--selected {
+  color: var(--ldp-primary);
+  font-weight: 600;
+  font-size: 17px;
+}
+
+.ldp-datetime-picker__time-item--placeholder {
+  visibility: hidden;
+}
+
+/* 底部 */
+.ldp-datetime-picker__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--ldp-border-color);
+}
+
+.ldp-datetime-picker__now-btn {
+  padding: 6px 14px;
+  border: 1px solid var(--ldp-border-color);
+  background: var(--ldp-bg-primary);
+  color: var(--ldp-text-secondary);
+  border-radius: var(--ldp-border-radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.15s;
+}
+
+.ldp-datetime-picker__now-btn:hover {
+  border-color: var(--ldp-primary);
+  color: var(--ldp-primary);
+}
+
+.ldp-datetime-picker__confirm-btn {
+  padding: 6px 18px;
+  border: none;
+  background: var(--ldp-primary);
+  color: #fff;
+  border-radius: var(--ldp-border-radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.15s;
+}
+
+.ldp-datetime-picker__confirm-btn:hover {
+  background: var(--ldp-primary-hover);
+}

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LDesign DatePicker 示例</title>
+  <link rel="stylesheet" href="../src/styles/index.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      padding: 40px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 40px;
+    }
+
+    h2 {
+      color: #666;
+      margin-bottom: 16px;
+      font-size: 18px;
+    }
+
+    .theme-switch {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .theme-switch button {
+      padding: 8px 24px;
+      margin: 0 8px;
+      border: 1px solid #d9d9d9;
+      background: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .theme-switch button:hover {
+      border-color: #1890ff;
+      color: #1890ff;
+    }
+
+    .theme-switch button.active {
+      background: #1890ff;
+      color: #fff;
+      border-color: #1890ff;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .demo-card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .picker-container {
+      margin-top: 16px;
+      border: 1px solid #e8e8e8;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .value-display {
+      margin-top: 16px;
+      padding: 12px;
+      background: #f9f9f9;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .value-display strong {
+      color: #1890ff;
+    }
+
+    .demo-desc {
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 12px;
+    }
+
+    /* 暗色主题 */
+    body.dark {
+      background: #1a1a1a;
+    }
+
+    body.dark h1 {
+      color: #fff;
+    }
+
+    body.dark h2 {
+      color: #bbb;
+    }
+
+    body.dark .demo-card {
+      background: #2a2a2a;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.32);
+    }
+
+    body.dark .picker-container {
+      border-color: #434343;
+    }
+
+    body.dark .value-display {
+      background: #1f1f1f;
+      color: #bbb;
+    }
+
+    body.dark .theme-switch button {
+      background: #2a2a2a;
+      border-color: #434343;
+      color: #fff;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>🗓️ LDesign DatePicker 组件库</h1>
+
+    <div class="theme-switch">
+      <button class="active" onclick="setTheme('light')">☀️ 亮色主题</button>
+      <button onclick="setTheme('dark')">🌙 暗色主题</button>
+    </div>
+
+    <div class="demo-grid">
+      <!-- 日期选择器 -->
+      <div class="demo-card">
+        <h2>📅 日期选择器 DatePicker</h2>
+        <div id="date-picker" class="picker-container"></div>
+        <div id="date-value" class="value-display">请选择日期</div>
+      </div>
+
+      <!-- 年份选择器 -->
+      <div class="demo-card">
+        <h2>📆 年份选择器 YearPicker</h2>
+        <div id="year-picker" class="picker-container"></div>
+        <div id="year-value" class="value-display">请选择年份</div>
+      </div>
+
+      <!-- 月份选择器 -->
+      <div class="demo-card">
+        <h2>📅 月份选择器 MonthPicker</h2>
+        <div id="month-picker" class="picker-container"></div>
+        <div id="month-value" class="value-display">请选择月份</div>
+      </div>
+
+      <!-- 星期选择器 -->
+      <div class="demo-card">
+        <h2>📋 星期选择器 WeekPicker</h2>
+        <div id="week-picker" class="picker-container"></div>
+        <div id="week-value" class="value-display">请选择周</div>
+      </div>
+
+      <!-- 时间选择器 -->
+      <div class="demo-card">
+        <h2>⏰ 时间选择器 TimePicker</h2>
+        <p class="demo-desc">滚轮选择器效果，支持鼠标滚轮和点击</p>
+        <div id="time-picker" class="picker-container"></div>
+        <div id="time-value" class="value-display">请选择时间</div>
+      </div>
+
+      <!-- 日期时间选择器 -->
+      <div class="demo-card" style="grid-column: span 2;">
+        <h2>📅⏰ 日期时间选择器 DateTimePicker</h2>
+        <p class="demo-desc">左侧日期 + 右侧时间滚轮</p>
+        <div id="datetime-picker" class="picker-container"></div>
+        <div id="datetime-value" class="value-display">请选择日期时间</div>
+      </div>
+
+      <!-- 日期范围选择器 -->
+      <div class="demo-card" style="grid-column: span 2;">
+        <h2>📅↔️📅 日期范围选择器 DateRangePicker</h2>
+        <p class="demo-desc">选完起止日期后不再有hover效果</p>
+        <div id="daterange-picker" class="picker-container"></div>
+        <div id="daterange-value" class="value-display">请选择日期范围</div>
+      </div>
+
+      <!-- 年份范围选择器 -->
+      <div class="demo-card">
+        <h2>📆↔️📆 年份范围选择器 YearRangePicker</h2>
+        <div id="yearrange-picker" class="picker-container"></div>
+        <div id="yearrange-value" class="value-display">请选择年份范围</div>
+      </div>
+
+      <!-- 月份范围选择器 -->
+      <div class="demo-card" style="grid-column: span 2;">
+        <h2>📅↔️📅 月份范围选择器 MonthRangePicker</h2>
+        <div id="monthrange-picker" class="picker-container"></div>
+        <div id="monthrange-value" class="value-display">请选择月份范围</div>
+      </div>
+
+      <!-- 时间范围选择器 -->
+      <div class="demo-card" style="grid-column: span 2;">
+        <h2>⏰↔️⏰ 时间范围选择器 TimeRangePicker</h2>
+        <div id="timerange-picker" class="picker-container"></div>
+        <div id="timerange-value" class="value-display">请选择时间范围</div>
+      </div>
+
+      <!-- 日期时间范围选择器 -->
+      <div class="demo-card" style="grid-column: span 2;">
+        <h2>📅⏰↔️📅⏰ 日期时间范围选择器 DateTimeRangePicker</h2>
+        <div id="datetimerange-picker" class="picker-container"></div>
+        <div id="datetimerange-value" class="value-display">请选择日期时间范围</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import {
+      DatePicker,
+      YearPicker,
+      MonthPicker,
+      WeekPicker,
+      TimePicker,
+      DateTimePicker,
+      DateRangePicker,
+      YearRangePicker,
+      MonthRangePicker,
+      TimeRangePicker,
+      DateTimeRangePicker,
+      i18n,
+      zhCN,
+      enUS
+    } from '../src/index.ts';
+
+    // 注册语言包
+    i18n.register(zhCN);
+    i18n.register(enUS);
+    i18n.use('zh-CN');
+
+    // 格式化日期
+    function formatDate(date) {
+      if (!date) return '未选择';
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function formatDateTime(date) {
+      if (!date) return '未选择';
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      const h = String(date.getHours()).padStart(2, '0');
+      const min = String(date.getMinutes()).padStart(2, '0');
+      const s = String(date.getSeconds()).padStart(2, '0');
+      return `${y}-${m}-${d} ${h}:${min}:${s}`;
+    }
+
+    function formatTime(date) {
+      if (!date) return '未选择';
+      const h = String(date.getHours()).padStart(2, '0');
+      const m = String(date.getMinutes()).padStart(2, '0');
+      const s = String(date.getSeconds()).padStart(2, '0');
+      return `${h}:${m}:${s}`;
+    }
+
+    // 日期选择器
+    const datePicker = new DatePicker({
+      showToday: true,
+      showConfirm: false,
+      onChange: (value) => {
+        document.getElementById('date-value').innerHTML =
+          `选中日期: <strong>${formatDate(value)}</strong>`;
+      }
+    });
+    datePicker.mount(document.getElementById('date-picker'));
+
+    // 年份选择器
+    const yearPicker = new YearPicker({
+      showToday: true,
+      showConfirm: false,
+      onChange: (value) => {
+        document.getElementById('year-value').innerHTML =
+          `选中年份: <strong>${value ? value.getFullYear() : '未选择'}</strong>`;
+      }
+    });
+    yearPicker.mount(document.getElementById('year-picker'));
+
+    // 月份选择器
+    const monthPicker = new MonthPicker({
+      showToday: true,
+      showConfirm: false,
+      onChange: (value) => {
+        if (value) {
+          const y = value.getFullYear();
+          const m = value.getMonth() + 1;
+          document.getElementById('month-value').innerHTML =
+            `选中月份: <strong>${y}年${m}月</strong>`;
+        }
+      }
+    });
+    monthPicker.mount(document.getElementById('month-picker'));
+
+    // 星期选择器
+    const weekPicker = new WeekPicker({
+      showToday: true,
+      showConfirm: false,
+      onChange: (value) => {
+        if (value) {
+          const range = weekPicker.getWeekRange();
+          if (range) {
+            document.getElementById('week-value').innerHTML =
+              `选中周: <strong>${formatDate(range[0])} ~ ${formatDate(range[1])}</strong>`;
+          }
+        }
+      }
+    });
+    weekPicker.mount(document.getElementById('week-picker'));
+
+    // 时间选择器
+    const timePicker = new TimePicker({
+      showNow: true,
+      showConfirm: true,
+      onChange: (value) => {
+        document.getElementById('time-value').innerHTML =
+          `选中时间: <strong>${formatTime(value)}</strong>`;
+      }
+    });
+    timePicker.mount(document.getElementById('time-picker'));
+
+    // 日期时间选择器
+    const dateTimePicker = new DateTimePicker({
+      onChange: (value) => {
+        document.getElementById('datetime-value').innerHTML =
+          `选中日期时间: <strong>${formatDateTime(value)}</strong>`;
+      }
+    });
+    dateTimePicker.mount(document.getElementById('datetime-picker'));
+
+    // 日期范围选择器
+    const dateRangePicker = new DateRangePicker({
+      showWeekNumber: true,
+      onChange: (value) => {
+        if (value && value[0] && value[1]) {
+          document.getElementById('daterange-value').innerHTML =
+            `选中范围: <strong>${formatDate(value[0])} ~ ${formatDate(value[1])}</strong>`;
+        } else if (value && value[0]) {
+          document.getElementById('daterange-value').innerHTML =
+            `开始日期: <strong>${formatDate(value[0])}</strong>，请选择结束日期`;
+        }
+      }
+    });
+    dateRangePicker.mount(document.getElementById('daterange-picker'));
+
+    // 年份范围选择器
+    const yearRangePicker = new YearRangePicker({
+      onChange: (value) => {
+        if (value && value[0] && value[1]) {
+          document.getElementById('yearrange-value').innerHTML =
+            `选中范围: <strong>${value[0].getFullYear()} ~ ${value[1].getFullYear()}</strong>`;
+        }
+      }
+    });
+    yearRangePicker.mount(document.getElementById('yearrange-picker'));
+
+    // 月份范围选择器
+    const monthRangePicker = new MonthRangePicker({
+      onChange: (value) => {
+        if (value && value[0] && value[1]) {
+          const s = `${value[0].getFullYear()}年${value[0].getMonth() + 1}月`;
+          const e = `${value[1].getFullYear()}年${value[1].getMonth() + 1}月`;
+          document.getElementById('monthrange-value').innerHTML =
+            `选中范围: <strong>${s} ~ ${e}</strong>`;
+        }
+      }
+    });
+    monthRangePicker.mount(document.getElementById('monthrange-picker'));
+
+    // 时间范围选择器
+    const timeRangePicker = new TimeRangePicker({
+      onChange: (value) => {
+        if (value && value[0] && value[1]) {
+          document.getElementById('timerange-value').innerHTML =
+            `选中范围: <strong>${formatTime(value[0])} ~ ${formatTime(value[1])}</strong>`;
+        }
+      }
+    });
+    timeRangePicker.mount(document.getElementById('timerange-picker'));
+
+    // 日期时间范围选择器
+    const dateTimeRangePicker = new DateTimeRangePicker({
+      onChange: (value) => {
+        if (value && value[0] && value[1]) {
+          document.getElementById('datetimerange-value').innerHTML =
+            `选中范围: <strong>${formatDateTime(value[0])} ~ ${formatDateTime(value[1])}</strong>`;
+        }
+      }
+    });
+    dateTimeRangePicker.mount(document.getElementById('datetimerange-picker'));
+
+    // 主题切换
+    window.setTheme = function (theme) {
+      document.body.classList.toggle('dark', theme === 'dark');
+      document.body.setAttribute('data-theme', theme);
+
+      // 更新按钮状态
+      document.querySelectorAll('.theme-switch button').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+    };
+  </script>
+</body>
+
+</html>

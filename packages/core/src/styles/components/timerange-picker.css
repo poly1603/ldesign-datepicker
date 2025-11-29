@@ -1,0 +1,173 @@
+/**
+ * 时间范围选择器样式
+ */
+
+.ldp-timerange-picker {
+  background: var(--ldp-bg-primary);
+  border-radius: var(--ldp-border-radius-lg);
+  padding: 16px;
+  min-width: 420px;
+}
+
+.ldp-timerange-picker__panels {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ldp-timerange-picker__arrow {
+  color: var(--ldp-text-disabled);
+  font-size: 20px;
+  padding: 0 8px;
+}
+
+.ldp-timerange-picker__panel {
+  flex: 1;
+  background: var(--ldp-bg-secondary);
+  border-radius: var(--ldp-border-radius);
+  padding: 12px;
+}
+
+.ldp-timerange-picker__title {
+  font-size: 12px;
+  color: var(--ldp-text-secondary);
+  text-align: center;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.ldp-timerange-picker__display {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, var(--ldp-primary) 0%, var(--ldp-primary-hover) 100%);
+  border-radius: var(--ldp-border-radius);
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+}
+
+.ldp-timerange-picker__wheel {
+  position: relative;
+  height: 150px;
+  overflow: hidden;
+  border-radius: var(--ldp-border-radius-sm);
+}
+
+.ldp-timerange-picker__indicator {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 50%;
+  height: 36px;
+  transform: translateY(-50%);
+  background: rgba(24, 144, 255, 0.1);
+  border: 2px solid var(--ldp-primary);
+  border-radius: var(--ldp-border-radius);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ldp-timerange-picker__mask {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 57px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.ldp-timerange-picker__mask--top {
+  top: 0;
+  background: linear-gradient(to bottom, var(--ldp-bg-secondary) 30%, transparent 100%);
+}
+
+.ldp-timerange-picker__mask--bottom {
+  bottom: 0;
+  background: linear-gradient(to top, var(--ldp-bg-secondary) 30%, transparent 100%);
+}
+
+.ldp-timerange-picker__columns {
+  display: flex;
+  height: 100%;
+}
+
+.ldp-timerange-picker__column {
+  flex: 1;
+  overflow: hidden;
+  cursor: ns-resize;
+}
+
+.ldp-timerange-picker__wrapper {
+  padding-top: 54px;
+}
+
+.ldp-timerange-picker__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  font-size: 15px;
+  color: var(--ldp-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.ldp-timerange-picker__item:hover:not(.ldp-timerange-picker__item--placeholder) {
+  color: var(--ldp-primary);
+}
+
+.ldp-timerange-picker__item--selected {
+  color: var(--ldp-primary);
+  font-weight: 600;
+  font-size: 17px;
+}
+
+.ldp-timerange-picker__item--placeholder {
+  visibility: hidden;
+}
+
+.ldp-timerange-picker__footer {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ldp-border-color);
+}
+
+.ldp-timerange-picker__buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ldp-timerange-picker__clear-btn {
+  padding: 6px 12px;
+  border: 1px solid var(--ldp-border-color);
+  background: var(--ldp-bg-primary);
+  color: var(--ldp-text-secondary);
+  border-radius: var(--ldp-border-radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.15s;
+}
+
+.ldp-timerange-picker__clear-btn:hover {
+  border-color: var(--ldp-primary);
+  color: var(--ldp-primary);
+}
+
+.ldp-timerange-picker__confirm-btn {
+  padding: 6px 16px;
+  border: none;
+  background: var(--ldp-primary);
+  color: #fff;
+  border-radius: var(--ldp-border-radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.15s;
+}
+
+.ldp-timerange-picker__confirm-btn:hover {
+  background: var(--ldp-primary-hover);
+}
