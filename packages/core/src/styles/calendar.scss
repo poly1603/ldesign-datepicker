@@ -1,0 +1,152 @@
+/**
+ * 日历面板样式
+ */
+
+@use 'variables' as *;
+
+.ldp-calendar {
+  width: $ldp-panel-width;
+}
+
+.ldp-calendar__weekdays {
+  display: flex;
+  align-items: center;
+  margin-bottom: $ldp-spacing-1;
+}
+
+.ldp-calendar__weekday {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: $ldp-cell-size;
+  color: $ldp-text-color-secondary;
+  font-size: $ldp-font-size-small;
+  font-weight: 500;
+}
+
+.ldp-calendar__week-number {
+  width: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $ldp-text-color-placeholder;
+  font-size: $ldp-font-size-small;
+}
+
+.ldp-calendar__row {
+  display: flex;
+  align-items: center;
+}
+
+.ldp-calendar__cell {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: $ldp-cell-size;
+  padding: 2px;
+  cursor: pointer;
+  transition: background-color $ldp-transition-duration $ldp-transition-timing;
+
+  &:hover:not(&--disabled):not(&--selected),
+  &--hover:not(&--disabled):not(&--selected) {
+    .ldp-calendar__cell-inner {
+      background-color: $ldp-bg-color-container-hover;
+    }
+  }
+
+  &--other-month {
+    .ldp-calendar__cell-inner {
+      color: $ldp-text-color-placeholder;
+    }
+  }
+
+  &--today {
+    .ldp-calendar__cell-inner {
+      border: 1px solid $ldp-primary-color;
+      color: $ldp-primary-color;
+    }
+  }
+
+  &--selected {
+    .ldp-calendar__cell-inner {
+      background-color: $ldp-primary-color;
+      color: $ldp-text-color-anti;
+      border-color: $ldp-primary-color;
+    }
+  }
+
+  &--disabled {
+    cursor: not-allowed;
+
+    .ldp-calendar__cell-inner {
+      color: $ldp-text-color-disabled;
+      background-color: transparent;
+    }
+  }
+
+  &--in-range {
+    background-color: $ldp-primary-color-light;
+
+    &:hover {
+      background-color: $ldp-primary-color-light-hover;
+    }
+  }
+
+  &--range-start {
+    border-radius: $ldp-border-radius 0 0 $ldp-border-radius;
+    background-color: $ldp-primary-color-light;
+
+    .ldp-calendar__cell-inner {
+      background-color: $ldp-primary-color;
+      color: $ldp-text-color-anti;
+    }
+  }
+
+  &--range-end {
+    border-radius: 0 $ldp-border-radius $ldp-border-radius 0;
+    background-color: $ldp-primary-color-light;
+
+    .ldp-calendar__cell-inner {
+      background-color: $ldp-primary-color;
+      color: $ldp-text-color-anti;
+    }
+  }
+
+  &--range-start.ldp-calendar__cell--range-end {
+    border-radius: $ldp-border-radius;
+  }
+
+  // 周选择模式
+  &--week-selected {
+    background-color: $ldp-primary-color;
+
+    .ldp-calendar__cell-inner {
+      color: $ldp-text-color-anti;
+      background-color: transparent;
+    }
+
+    &:first-child {
+      border-radius: $ldp-border-radius 0 0 $ldp-border-radius;
+    }
+
+    &:last-child {
+      border-radius: 0 $ldp-border-radius $ldp-border-radius 0;
+    }
+  }
+}
+
+.ldp-calendar__cell-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: $ldp-border-radius;
+  border: 1px solid transparent;
+  transition: background-color $ldp-transition-duration $ldp-transition-timing,
+    color $ldp-transition-duration $ldp-transition-timing,
+    border-color $ldp-transition-duration $ldp-transition-timing;
+}

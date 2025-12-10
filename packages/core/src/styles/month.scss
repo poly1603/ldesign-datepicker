@@ -1,0 +1,96 @@
+/**
+ * 月份面板样式
+ */
+
+@use 'variables' as *;
+
+.ldp-month-panel {
+  width: $ldp-panel-width;
+  padding: $ldp-spacing-2;
+}
+
+.ldp-month-panel__row {
+  display: flex;
+  margin-bottom: $ldp-spacing-2;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.ldp-month-panel__cell {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  cursor: pointer;
+  transition: background-color $ldp-transition-duration $ldp-transition-timing;
+
+  &:hover:not(&--disabled):not(&--selected) {
+    .ldp-month-panel__cell-inner {
+      background-color: $ldp-bg-color-container-hover;
+    }
+  }
+
+  &--current {
+    .ldp-month-panel__cell-inner {
+      border: 1px solid $ldp-primary-color;
+      color: $ldp-primary-color;
+    }
+  }
+
+  &--selected {
+    .ldp-month-panel__cell-inner {
+      background-color: $ldp-primary-color;
+      color: $ldp-text-color-anti;
+      border-color: $ldp-primary-color;
+    }
+  }
+
+  &--disabled {
+    cursor: not-allowed;
+
+    .ldp-month-panel__cell-inner {
+      color: $ldp-text-color-disabled;
+    }
+  }
+
+  &--in-range {
+    background-color: $ldp-primary-color-light;
+  }
+
+  &--range-start {
+    border-radius: $ldp-border-radius 0 0 $ldp-border-radius;
+    background-color: $ldp-primary-color-light;
+
+    .ldp-month-panel__cell-inner {
+      background-color: $ldp-primary-color;
+      color: $ldp-text-color-anti;
+    }
+  }
+
+  &--range-end {
+    border-radius: 0 $ldp-border-radius $ldp-border-radius 0;
+    background-color: $ldp-primary-color-light;
+
+    .ldp-month-panel__cell-inner {
+      background-color: $ldp-primary-color;
+      color: $ldp-text-color-anti;
+    }
+  }
+}
+
+.ldp-month-panel__cell-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 36px;
+  border-radius: $ldp-border-radius;
+  border: 1px solid transparent;
+  font-size: $ldp-font-size;
+  transition: background-color $ldp-transition-duration $ldp-transition-timing,
+    color $ldp-transition-duration $ldp-transition-timing,
+    border-color $ldp-transition-duration $ldp-transition-timing;
+}

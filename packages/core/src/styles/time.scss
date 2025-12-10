@@ -1,0 +1,90 @@
+/**
+ * 时间面板样式
+ */
+
+@use 'variables' as *;
+
+.ldp-time-panel {
+  display: flex;
+  height: 224px;
+  border-left: 1px solid $ldp-border-color;
+}
+
+.ldp-time-panel__column {
+  width: $ldp-time-column-width;
+  height: 100%;
+  overflow: hidden;
+
+  &:not(:last-child) {
+    border-right: 1px solid $ldp-border-color;
+  }
+}
+
+.ldp-time-panel__list {
+  height: 100%;
+  overflow-y: auto;
+  padding: $ldp-spacing-1 0;
+
+  // 隐藏滚动条但保留功能
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+  }
+}
+
+.ldp-time-panel__cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: $ldp-time-cell-height;
+  padding: 0 $ldp-spacing-2;
+  color: $ldp-text-color-primary;
+  cursor: pointer;
+  transition: background-color $ldp-transition-duration $ldp-transition-timing,
+    color $ldp-transition-duration $ldp-transition-timing;
+
+  &:hover:not(&--disabled):not(&--selected) {
+    background-color: $ldp-bg-color-container-hover;
+  }
+
+  &--selected {
+    background-color: $ldp-primary-color-light;
+    color: $ldp-primary-color;
+    font-weight: 600;
+  }
+
+  &--disabled {
+    color: $ldp-text-color-disabled;
+    cursor: not-allowed;
+  }
+}
+
+// 独立时间选择器面板
+.ldp-time-picker-panel {
+  display: flex;
+  padding: $ldp-spacing-2;
+
+  .ldp-time-panel {
+    border-left: none;
+    height: 200px;
+  }
+}
+
+.ldp-time-picker-panel__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: $ldp-spacing-2 $ldp-spacing-3;
+  border-top: 1px solid $ldp-border-color;
+}

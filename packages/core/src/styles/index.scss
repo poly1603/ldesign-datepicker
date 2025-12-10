@@ -1,0 +1,25 @@
+/**
+ * DatePicker 样式入口
+ */
+
+@use 'variables';
+@use 'input';
+@use 'popup';
+@use 'calendar';
+@use 'month';
+@use 'quarter';
+@use 'year';
+@use 'time';
+
+// 重置基础样式
+.ldp-input-wrapper,
+.ldp-popup,
+.ldp-panel {
+  box-sizing: border-box;
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: inherit;
+  }
+}

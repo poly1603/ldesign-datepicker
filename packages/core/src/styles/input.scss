@@ -1,0 +1,118 @@
+/**
+ * 输入框样式
+ */
+
+@use 'variables' as *;
+
+.ldp-input-wrapper {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  width: auto;
+  min-width: 200px;
+  height: $ldp-input-height;
+  padding: 0 $ldp-input-padding-horizontal;
+  background-color: $ldp-bg-color-container;
+  border: 1px solid $ldp-border-color;
+  border-radius: $ldp-border-radius;
+  font-family: $ldp-font-family;
+  font-size: $ldp-font-size;
+  color: $ldp-text-color-primary;
+  cursor: pointer;
+  transition: border-color $ldp-transition-duration $ldp-transition-timing,
+    box-shadow $ldp-transition-duration $ldp-transition-timing;
+
+  &:hover {
+    border-color: $ldp-border-color-hover;
+  }
+
+  &:focus-within,
+  &--focused {
+    border-color: $ldp-primary-color;
+    box-shadow: 0 0 0 2px rgba($ldp-primary-color, 0.2);
+  }
+
+  &--disabled {
+    background-color: $ldp-bg-color-component;
+    cursor: not-allowed;
+
+    .ldp-input {
+      color: $ldp-text-color-disabled;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.ldp-input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  cursor: inherit;
+
+  &::placeholder {
+    color: $ldp-text-color-placeholder;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.ldp-input-separator {
+  flex-shrink: 0;
+  padding: 0 $ldp-spacing-2;
+  color: $ldp-text-color-secondary;
+}
+
+.ldp-input-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: $ldp-spacing-2;
+  color: $ldp-text-color-secondary;
+
+  svg {
+    display: block;
+  }
+}
+
+.ldp-input-clear {
+  flex-shrink: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  margin-left: $ldp-spacing-1;
+  padding: 2px;
+  color: $ldp-text-color-secondary;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: color $ldp-transition-duration $ldp-transition-timing,
+    background-color $ldp-transition-duration $ldp-transition-timing;
+
+  &:hover {
+    color: $ldp-text-color-primary;
+    background-color: $ldp-bg-color-container-hover;
+  }
+
+  .ldp-input-wrapper:hover & {
+    display: flex;
+  }
+}
+
+// 范围输入框样式
+.ldp-input-wrapper--range {
+  min-width: 360px;
+
+  .ldp-input {
+    text-align: center;
+  }
+}

@@ -1,0 +1,158 @@
+/**
+ * 弹出层样式
+ */
+
+@use 'variables' as *;
+
+.ldp-popup {
+  position: absolute;
+  z-index: $ldp-z-index-popup;
+  background-color: $ldp-bg-color-container;
+  border-radius: $ldp-border-radius-medium;
+  box-shadow: $ldp-shadow;
+  font-family: $ldp-font-family;
+  font-size: $ldp-font-size;
+  color: $ldp-text-color-primary;
+  animation: ldp-popup-fade-in $ldp-transition-duration $ldp-transition-timing;
+}
+
+@keyframes ldp-popup-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ldp-panel {
+  display: flex;
+  flex-direction: column;
+  padding: $ldp-panel-padding;
+}
+
+.ldp-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: $ldp-panel-header-height;
+  padding: 0 $ldp-spacing-2;
+}
+
+.ldp-panel-header-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: $ldp-border-radius;
+  color: $ldp-text-color-secondary;
+  font-size: 16px;
+  cursor: pointer;
+  transition: color $ldp-transition-duration $ldp-transition-timing,
+    background-color $ldp-transition-duration $ldp-transition-timing;
+
+  &:hover {
+    color: $ldp-text-color-primary;
+    background-color: $ldp-bg-color-container-hover;
+  }
+
+  &:active {
+    background-color: $ldp-bg-color-container-active;
+  }
+
+  &:disabled {
+    color: $ldp-text-color-disabled;
+    cursor: not-allowed;
+
+    &:hover {
+      background-color: transparent;
+    }
+  }
+}
+
+.ldp-panel-header-title {
+  flex: 1;
+  text-align: center;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color $ldp-transition-duration $ldp-transition-timing;
+
+  &:hover {
+    color: $ldp-primary-color;
+  }
+}
+
+.ldp-panel-content {
+  display: flex;
+  gap: $ldp-spacing-4;
+}
+
+.ldp-panel-body {
+  flex: 1;
+}
+
+.ldp-panel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: $ldp-panel-footer-height;
+  padding: $ldp-spacing-2 $ldp-spacing-3;
+  border-top: 1px solid $ldp-border-color;
+}
+
+.ldp-panel-footer-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 $ldp-spacing-3;
+  background: transparent;
+  border: none;
+  border-radius: $ldp-border-radius;
+  font-family: inherit;
+  font-size: $ldp-font-size;
+  cursor: pointer;
+  transition: color $ldp-transition-duration $ldp-transition-timing,
+    background-color $ldp-transition-duration $ldp-transition-timing;
+
+  &--link {
+    color: $ldp-primary-color;
+
+    &:hover {
+      color: $ldp-primary-color-hover;
+    }
+  }
+
+  &--primary {
+    background-color: $ldp-primary-color;
+    color: $ldp-text-color-anti;
+
+    &:hover {
+      background-color: $ldp-primary-color-hover;
+    }
+
+    &:active {
+      background-color: $ldp-primary-color-active;
+    }
+  }
+}
+
+// 范围选择时的双面板布局
+.ldp-panel--range {
+  .ldp-panel-content {
+    display: flex;
+  }
+
+  .ldp-panel-body {
+    &:first-child {
+      border-right: 1px solid $ldp-border-color;
+      padding-right: $ldp-spacing-4;
+    }
+  }
+}

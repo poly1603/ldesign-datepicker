@@ -1,0 +1,22 @@
+// 颜色变量
+:root {
+  --primary-color: #0052d9;
+  --primary-color-hover: #0034b5;
+  --primary-light: #ecf2fe;
+  
+  --text-primary: rgba(0, 0, 0, 0.9);
+  --text-secondary: rgba(0, 0, 0, 0.6);
+  --text-placeholder: rgba(0, 0, 0, 0.35);
+  --text-disabled: rgba(0, 0, 0, 0.26);
+  
+  --bg-page: #f5f7fa;
+  --bg-container: #ffffff;
+  --bg-hover: #f3f3f3;
+  --bg-code: #2d2d2d;
+  
+  --border-color: #e7e7e7;
+  --border-radius: 8px;
+  
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
