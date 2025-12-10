@@ -1,4 +1,4 @@
-﻿/**
+/**
  * DOM 渲染器
  */
 import type { DatePickerConfig, DateCell, TimeCell } from '../types';
@@ -31,7 +31,8 @@ export class DOMDatePicker {
     this.options = options;
     this.prefix = options.classPrefix || 'ldp';
     this.core = new DatePickerCore(options);
-    this.core.on('stateChange', () => this.render());
+    // 只在 change 事件时更新输入框，不在 stateChange 时重新渲染
+    this.core.on('change', () => this.updateInputValue());
     this.core.on('open', () => this.showPopup());
     this.core.on('close', () => this.hidePopup());
   }
@@ -58,7 +59,7 @@ export class DOMDatePicker {
     const input = document.createElement('input');
     input.className = this.prefix + '-input';
     input.type = 'text';
-    input.placeholder = (typeof placeholder === 'string' ? placeholder : '') || locale.placeholder || '请选择日期';
+    input.placeholder = (typeof placeholder === 'string' ? placeholder : '') || '请选择日期';
     input.readOnly = true;
     wrapper.appendChild(input);
     this.inputEl = input;
@@ -90,7 +91,7 @@ export class DOMDatePicker {
 
   private showPopup(): void {
     if (!this.initialized || !this.popupEl || !this.triggerEl) return;
-    this.render();
+    this.renderPanel();
     this.popupEl.style.display = 'block';
     this.popupEl.style.opacity = '0';
     void this.popupEl.offsetHeight;
@@ -108,12 +109,9 @@ export class DOMDatePicker {
     setTimeout(() => { if (this.popupEl && !this.core.getState().panel.visible) this.popupEl.style.display = 'none'; }, 200);
   }
 
-  private render(): void {
-    if (!this.initialized || !this.panelEl) return;
-    const state = this.core.getState();
+  private renderPanel(): void {
+    if (!this.panelEl) return;
     const opts = this.core.getOptions();
-    this.updateInputValue();
-    if (!state.panel.visible) return;
     this.panelEl.innerHTML = '';
     this.panelEl.appendChild(this.renderHeader());
     const content = document.createElement('div');
@@ -179,15 +177,29 @@ export class DOMDatePicker {
 
   private renderDateCell(cell: DateCell): HTMLElement {
     const mode = this.core.getOptions().mode;
-    const el = document.createElement('div'); el.className = getDateCellClass(cell, this.prefix);
-    const inner = document.createElement('span'); inner.className = this.prefix + '-calendar__cell-inner'; inner.textContent = cell.text;
+    const el = document.createElement('div');
+    el.className = getDateCellClass(cell, this.prefix);
+    const inner = document.createElement('span');
+    inner.className = this.prefix + '-calendar__cell-inner';
+    inner.textContent = cell.text;
     el.appendChild(inner);
     el.style.cursor = cell.isDisabled ? 'not-allowed' : 'pointer';
+
     const self = this;
-    el.onclick = function(e) { e.stopPropagation(); if (cell.isDisabled) return; if (mode === 'week') self.core.selectWeek(cell.date); else self.core.selectDate(cell.date); };
+    el.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (cell.isDisabled) return;
+      if (mode === 'week') self.core.selectWeek(cell.date);
+      else self.core.selectDate(cell.date);
+    });
+
     if (!cell.isDisabled) {
-      el.onmouseenter = () => { if (!cell.isSelected) inner.style.backgroundColor = '#f3f3f3'; self.core.setHoverDate(cell.date); };
-      el.onmouseleave = () => { if (!cell.isSelected) inner.style.backgroundColor = ''; self.core.setHoverDate(null); };
+      el.addEventListener('mouseenter', () => {
+        if (!cell.isSelected) inner.style.backgroundColor = '#f3f3f3';
+      });
+      el.addEventListener('mouseleave', () => {
+        if (!cell.isSelected) inner.style.backgroundColor = '';
+      });
     }
     return el;
   }
