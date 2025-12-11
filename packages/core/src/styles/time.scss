@@ -1,15 +1,183 @@
 /**
- * 时间面板样式
+ * 时间面板样式 - 滚轮选择器
  */
 
 @use 'variables' as *;
 
+$wheel-item-height: 36px;
+$wheel-visible-items: 5;
+
 .ldp-time-panel {
-  display: flex;
-  height: 224px;
-  border-left: 1px solid $ldp-border-color;
+  padding: $ldp-spacing-3;
+  min-height: 200px;
 }
 
+// 滚轮式时间选择器容器
+.ldp-time-panel__columns {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  gap: $ldp-spacing-1;
+  min-height: 180px;
+}
+
+// 选中区域指示器（中间高亮区域）
+.ldp-time-panel__indicator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: $wheel-item-height;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.04);
+  border-radius: $ldp-border-radius;
+  pointer-events: none;
+  z-index: 0;
+}
+
+// 分隔符
+.ldp-time-panel__separator {
+  display: none; // 默认隐藏
+  font-size: 18px;
+  font-weight: 600;
+  color: $ldp-text-color-primary;
+  z-index: 1;
+  user-select: none;
+  
+  // 显示冒号的情况
+  &--visible {
+    display: block;
+  }
+}
+
+// 滚轮列
+.ldp-time-panel__wheel {
+  width: 60px;
+  height: 180px !important; // 36px * 5
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+  cursor: grab;
+  user-select: none;
+  
+  // 顶部和底部渐变遮罩
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: $wheel-item-height;
+    pointer-events: none;
+    z-index: 2;
+  }
+  
+  &::before {
+    top: 0;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+  }
+  
+  &::after {
+    bottom: 0;
+    background: linear-gradient(to top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+  }
+  
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+// 滚轮内容包装器
+.ldp-time-panel__wheel-wrapper {
+  will-change: transform;
+}
+
+// 滚轮选项
+.ldp-time-panel__wheel-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: $ldp-text-color-secondary;
+  transition: color 0.1s ease, opacity 0.1s ease, transform 0.1s ease;
+  cursor: pointer;
+  
+  // 选中状态（中间）
+  &--selected {
+    color: $ldp-text-color-primary;
+    font-weight: 600;
+    font-size: 16px;
+  }
+  
+  // 相邻项（上下各一个）
+  &--near {
+    color: $ldp-text-color-secondary;
+    opacity: 0.8;
+    font-size: 14px;
+  }
+  
+  // 远离项
+  &--far {
+    color: $ldp-text-color-placeholder;
+    opacity: 0.5;
+    font-size: 13px;
+  }
+  
+  // 禁用状态
+  &--disabled {
+    color: $ldp-text-color-disabled;
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}
+
+// 时间选择器底部
+.ldp-time-panel__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $ldp-spacing-2 0;
+  margin-top: $ldp-spacing-2;
+  border-top: 1px solid $ldp-border-color;
+}
+
+.ldp-time-panel__now-btn {
+  background: transparent;
+  border: none;
+  color: $ldp-primary-color;
+  font-size: $ldp-font-size;
+  cursor: pointer;
+  padding: $ldp-spacing-1 $ldp-spacing-2;
+  border-radius: $ldp-border-radius;
+  transition: background-color $ldp-transition-duration $ldp-transition-timing;
+  
+  &:hover {
+    background-color: $ldp-bg-color-container-hover;
+  }
+}
+
+.ldp-time-panel__confirm-btn {
+  background-color: $ldp-primary-color;
+  border: none;
+  color: white;
+  font-size: $ldp-font-size;
+  cursor: pointer;
+  padding: $ldp-spacing-1 $ldp-spacing-3;
+  border-radius: $ldp-border-radius;
+  transition: background-color $ldp-transition-duration $ldp-transition-timing;
+  
+  &:hover {
+    background-color: $ldp-primary-color-hover;
+  }
+}
+
+// 独立时间选择器面板
+.ldp-time-picker-panel {
+  padding: $ldp-spacing-2;
+}
+
+// 旧版列表式时间选择器（保留兼容）
 .ldp-time-panel__column {
   width: $ldp-time-column-width;
   height: 100%;
@@ -24,8 +192,6 @@
   height: 100%;
   overflow-y: auto;
   padding: $ldp-spacing-1 0;
-
-  // 隐藏滚动条但保留功能
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 
@@ -68,23 +234,4 @@
     color: $ldp-text-color-disabled;
     cursor: not-allowed;
   }
-}
-
-// 独立时间选择器面板
-.ldp-time-picker-panel {
-  display: flex;
-  padding: $ldp-spacing-2;
-
-  .ldp-time-panel {
-    border-left: none;
-    height: 200px;
-  }
-}
-
-.ldp-time-picker-panel__footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: $ldp-spacing-2 $ldp-spacing-3;
-  border-top: 1px solid $ldp-border-color;
 }

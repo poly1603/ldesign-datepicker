@@ -38,6 +38,27 @@
 .ldp-calendar__row {
   display: flex;
   align-items: center;
+  
+  // 周选择模式下整行悬停效果
+  &--hover {
+    .ldp-calendar__cell:not(.ldp-calendar__cell--disabled):not(.ldp-calendar__cell--week-selected) {
+      background-color: $ldp-bg-color-container-hover;
+      
+      .ldp-calendar__cell-inner {
+        background-color: transparent;
+      }
+    }
+    
+    // 悬停时第一个单元格左侧圆角
+    .ldp-calendar__cell--week-start:not(.ldp-calendar__cell--disabled):not(.ldp-calendar__cell--week-selected) {
+      border-radius: $ldp-border-radius 0 0 $ldp-border-radius;
+    }
+    
+    // 悬停时最后一个单元格右侧圆角
+    .ldp-calendar__cell--week-end:not(.ldp-calendar__cell--disabled):not(.ldp-calendar__cell--week-selected) {
+      border-radius: 0 $ldp-border-radius $ldp-border-radius 0;
+    }
+  }
 }
 
 .ldp-calendar__cell {
@@ -50,8 +71,8 @@
   cursor: pointer;
   transition: background-color $ldp-transition-duration $ldp-transition-timing;
 
-  &:hover:not(&--disabled):not(&--selected),
-  &--hover:not(&--disabled):not(&--selected) {
+  &:hover:not(&--disabled):not(&--selected):not(&--week-selected),
+  &--hover:not(&--disabled):not(&--selected):not(&--week-selected) {
     .ldp-calendar__cell-inner {
       background-color: $ldp-bg-color-container-hover;
     }
@@ -122,19 +143,22 @@
   // 周选择模式
   &--week-selected {
     background-color: $ldp-primary-color;
-
+    
     .ldp-calendar__cell-inner {
-      color: $ldp-text-color-anti;
       background-color: transparent;
+      color: $ldp-text-color-anti;
+      border-color: transparent;
     }
-
-    &:first-child {
-      border-radius: $ldp-border-radius 0 0 $ldp-border-radius;
-    }
-
-    &:last-child {
-      border-radius: 0 $ldp-border-radius $ldp-border-radius 0;
-    }
+  }
+  
+  // 周选择模式下第一个日期单元格（周数后的第一个）
+  &--week-selected.ldp-calendar__cell--week-start {
+    border-radius: $ldp-border-radius 0 0 $ldp-border-radius;
+  }
+  
+  // 周选择模式下最后一个日期单元格
+  &--week-selected.ldp-calendar__cell--week-end {
+    border-radius: 0 $ldp-border-radius $ldp-border-radius 0;
   }
 }
 

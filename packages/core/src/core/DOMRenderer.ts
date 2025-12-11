@@ -9,6 +9,7 @@ import { getMonthCellClass } from '../panels/month';
 import { getQuarterCellClass } from '../panels/quarter';
 import { getYearCellClass } from '../panels/year';
 import { getTimeCellClass } from '../panels/time';
+import { getIconSvg } from '../utils/icons';
 
 export interface DOMRendererOptions extends DatePickerConfig {
   trigger?: HTMLElement | string;
@@ -31,8 +32,13 @@ export class DOMDatePicker {
     this.options = options;
     this.prefix = options.classPrefix || 'ldp';
     this.core = new DatePickerCore(options);
-    // 只在 change 事件时更新输入框，不在 stateChange 时重新渲染
-    this.core.on('change', () => this.updateInputValue());
+    this.core.on('change', () => {
+      this.updateInputValue();
+      // 值改变后重新渲染面板以更新选中状态
+      if (this.core.getState().panel.visible) {
+        this.renderPanel();
+      }
+    });
     this.core.on('open', () => this.showPopup());
     this.core.on('close', () => this.hidePopup());
   }
@@ -112,13 +118,14 @@ export class DOMDatePicker {
   private renderPanel(): void {
     if (!this.panelEl) return;
     const opts = this.core.getOptions();
+    const { type } = this.core.getState().panel;
     this.panelEl.innerHTML = '';
     this.panelEl.appendChild(this.renderHeader());
     const content = document.createElement('div');
     content.className = this.prefix + '-panel-content';
     content.appendChild(this.renderPanelContent(0));
     this.panelEl.appendChild(content);
-    if (opts.showToday || opts.showConfirm) this.panelEl.appendChild(this.renderFooter());
+    if (type === 'time' || opts.showToday || opts.showConfirm) this.panelEl.appendChild(this.renderFooter());
   }
 
   private updateInputValue(): void {
@@ -130,19 +137,26 @@ export class DOMDatePicker {
     const { type, viewDate } = this.core.getState().panel;
     const hdr = document.createElement('div');
     hdr.className = this.prefix + '-panel-header';
-    const prevY = document.createElement('button'); prevY.type = 'button'; prevY.className = this.prefix + '-panel-header-btn'; prevY.innerHTML = '';
-    prevY.onclick = e => { e.stopPropagation(); this.core.prevYear(); };
-    const prevM = document.createElement('button'); prevM.type = 'button'; prevM.className = this.prefix + '-panel-header-btn'; prevM.innerHTML = '';
-    prevM.onclick = e => { e.stopPropagation(); this.core.prev(); };
+
+    // 时间模式隐藏头部
+    if (type === 'time') {
+      hdr.style.display = 'none';
+      return hdr;
+    }
+
+    const prevY = document.createElement('button'); prevY.type = 'button'; prevY.className = this.prefix + '-panel-header-btn'; prevY.innerHTML = getIconSvg('chevronsLeft', 16);
+    prevY.onclick = e => { e.stopPropagation(); this.core.prevYear(); this.renderPanel(); };
+    const prevM = document.createElement('button'); prevM.type = 'button'; prevM.className = this.prefix + '-panel-header-btn'; prevM.innerHTML = getIconSvg('chevronLeft', 16);
+    prevM.onclick = e => { e.stopPropagation(); this.core.prev(); this.renderPanel(); };
     const title = document.createElement('span'); title.className = this.prefix + '-panel-header-title';
     const y = viewDate.getFullYear(), m = viewDate.getMonth() + 1;
-    if (type === 'date' || type === 'week') { title.textContent = y + '年 ' + m + '月'; title.style.cursor = 'pointer'; title.onclick = e => { e.stopPropagation(); this.core.setPanelType('month'); }; }
-    else if (type === 'month' || type === 'quarter') { title.textContent = y + '年'; title.style.cursor = 'pointer'; title.onclick = e => { e.stopPropagation(); this.core.setPanelType('year'); }; }
+    if (type === 'date' || type === 'week') { title.textContent = y + '年 ' + m + '月'; title.style.cursor = 'pointer'; title.onclick = e => { e.stopPropagation(); this.core.setPanelType('month'); this.renderPanel(); }; }
+    else if (type === 'month' || type === 'quarter') { title.textContent = y + '年'; title.style.cursor = 'pointer'; title.onclick = e => { e.stopPropagation(); this.core.setPanelType('year'); this.renderPanel(); }; }
     else { title.textContent = this.core.getYearPanelData().decadeText; }
-    const nextM = document.createElement('button'); nextM.type = 'button'; nextM.className = this.prefix + '-panel-header-btn'; nextM.innerHTML = '';
-    nextM.onclick = e => { e.stopPropagation(); this.core.next(); };
-    const nextY = document.createElement('button'); nextY.type = 'button'; nextY.className = this.prefix + '-panel-header-btn'; nextY.innerHTML = '';
-    nextY.onclick = e => { e.stopPropagation(); this.core.nextYear(); };
+    const nextM = document.createElement('button'); nextM.type = 'button'; nextM.className = this.prefix + '-panel-header-btn'; nextM.innerHTML = getIconSvg('chevronRight', 16);
+    nextM.onclick = e => { e.stopPropagation(); this.core.next(); this.renderPanel(); };
+    const nextY = document.createElement('button'); nextY.type = 'button'; nextY.className = this.prefix + '-panel-header-btn'; nextY.innerHTML = getIconSvg('chevronsRight', 16);
+    nextY.onclick = e => { e.stopPropagation(); this.core.nextYear(); this.renderPanel(); };
     hdr.appendChild(prevY);
     if (type === 'date' || type === 'week') hdr.appendChild(prevM);
     hdr.appendChild(title);
@@ -157,28 +171,61 @@ export class DOMDatePicker {
     if (type === 'date' || type === 'week') p.appendChild(this.renderCalendar(idx));
     else if (type === 'month') p.appendChild(this.renderMonthPanel(idx));
     else if (type === 'quarter') p.appendChild(this.renderQuarterPanel(idx));
+    else if (type === 'time') p.appendChild(this.renderTimePanel());
     else p.appendChild(this.renderYearPanel(idx));
     return p;
   }
 
   private renderCalendar(idx: number): HTMLElement {
     const data = this.core.getCalendarPanelData(idx);
+    const mode = this.core.getOptions().mode;
+    const showWeekNumber = mode === 'week';
     const cal = document.createElement('div'); cal.className = this.prefix + '-calendar';
+
     const wkRow = document.createElement('div'); wkRow.className = this.prefix + '-calendar__weekdays';
-    for (const wd of data.weekdays) { const d = document.createElement('div'); d.className = this.prefix + '-calendar__weekday'; d.textContent = wd; wkRow.appendChild(d); }
+    if (showWeekNumber) {
+      const emptyCell = document.createElement('div');
+      emptyCell.className = this.prefix + '-calendar__week-number';
+      wkRow.appendChild(emptyCell);
+    }
+    for (const wd of data.weekdays) {
+      const d = document.createElement('div');
+      d.className = this.prefix + '-calendar__weekday';
+      d.textContent = wd;
+      wkRow.appendChild(d);
+    }
     cal.appendChild(wkRow);
+
     for (const row of data.rows) {
       const r = document.createElement('div'); r.className = this.prefix + '-calendar__row';
-      for (const cell of row) r.appendChild(this.renderDateCell(cell));
+      if (showWeekNumber && row.length > 0) {
+        const weekNum = document.createElement('div');
+        weekNum.className = this.prefix + '-calendar__week-number';
+        weekNum.textContent = row[0].weekNumber?.toString() || '';
+        r.appendChild(weekNum);
+      }
+      for (let i = 0; i < row.length; i++) {
+        const cell = row[i];
+        const isFirst = i === 0;
+        const isLast = i === row.length - 1;
+        r.appendChild(this.renderDateCell(cell, r, isFirst, isLast));
+      }
       cal.appendChild(r);
     }
     return cal;
   }
 
-  private renderDateCell(cell: DateCell): HTMLElement {
+  private renderDateCell(cell: DateCell, row?: HTMLElement, isFirst = false, isLast = false): HTMLElement {
     const mode = this.core.getOptions().mode;
     const el = document.createElement('div');
     el.className = getDateCellClass(cell, this.prefix);
+
+    // 周选择模式下，给第一个和最后一个单元格添加特定class
+    if (mode === 'week') {
+      if (isFirst) el.classList.add(this.prefix + '-calendar__cell--week-start');
+      if (isLast) el.classList.add(this.prefix + '-calendar__cell--week-end');
+    }
+
     const inner = document.createElement('span');
     inner.className = this.prefix + '-calendar__cell-inner';
     inner.textContent = cell.text;
@@ -194,12 +241,25 @@ export class DOMDatePicker {
     });
 
     if (!cell.isDisabled) {
-      el.addEventListener('mouseenter', () => {
-        if (!cell.isSelected) inner.style.backgroundColor = '#f3f3f3';
-      });
-      el.addEventListener('mouseleave', () => {
-        if (!cell.isSelected) inner.style.backgroundColor = '';
-      });
+      if (mode === 'week' && row) {
+        // 周选择模式：鼠标悬停高亮整行
+        el.addEventListener('mouseenter', () => {
+          if (!cell.isWeekSelected) {
+            row.classList.add(this.prefix + '-calendar__row--hover');
+          }
+        });
+        el.addEventListener('mouseleave', () => {
+          row.classList.remove(this.prefix + '-calendar__row--hover');
+        });
+      } else {
+        // 日期选择模式：只高亮当前单元格
+        el.addEventListener('mouseenter', () => {
+          if (!cell.isSelected) inner.style.backgroundColor = '#f3f3f3';
+        });
+        el.addEventListener('mouseleave', () => {
+          if (!cell.isSelected) inner.style.backgroundColor = '';
+        });
+      }
     }
     return el;
   }
@@ -255,27 +315,181 @@ export class DOMDatePicker {
 
   private renderTimePanel(): HTMLElement {
     const data = this.core.getTimePanelData();
-    const p = document.createElement('div'); p.className = this.prefix + '-time-panel';
-    p.appendChild(this.renderTimeColumn(data.hours, v => this.core.selectTime({ hour: v })));
-    p.appendChild(this.renderTimeColumn(data.minutes, v => this.core.selectTime({ minute: v })));
-    if (data.showSeconds) p.appendChild(this.renderTimeColumn(data.seconds, v => this.core.selectTime({ second: v })));
+    const opts = this.core.getOptions();
+    const showSeparator = opts.showTimeSeparator ?? false;
+    const p = document.createElement('div');
+    p.className = this.prefix + '-time-panel';
+
+    const columns = document.createElement('div');
+    columns.className = this.prefix + '-time-panel__columns';
+
+    const indicator = document.createElement('div');
+    indicator.className = this.prefix + '-time-panel__indicator';
+    columns.appendChild(indicator);
+
+    const hourCol = this.renderTimeWheel(data.hours, v => this.core.selectTime({ hour: v }));
+    columns.appendChild(hourCol);
+
+    if (showSeparator) {
+      const sep1 = document.createElement('div');
+      sep1.className = this.prefix + '-time-panel__separator ' + this.prefix + '-time-panel__separator--visible';
+      sep1.textContent = ':';
+      columns.appendChild(sep1);
+    }
+
+    const minCol = this.renderTimeWheel(data.minutes, v => this.core.selectTime({ minute: v }));
+    columns.appendChild(minCol);
+
+    if (data.showSeconds) {
+      if (showSeparator) {
+        const sep2 = document.createElement('div');
+        sep2.className = this.prefix + '-time-panel__separator ' + this.prefix + '-time-panel__separator--visible';
+        sep2.textContent = ':';
+        columns.appendChild(sep2);
+      }
+
+      const secCol = this.renderTimeWheel(data.seconds, v => this.core.selectTime({ second: v }));
+      columns.appendChild(secCol);
+    }
+
+    p.appendChild(columns);
     return p;
   }
 
-  private renderTimeColumn(cells: TimeCell[], onSelect: (v: number) => void): HTMLElement {
-    const col = document.createElement('div'); col.className = this.prefix + '-time-panel__column';
-    const list = document.createElement('div'); list.className = this.prefix + '-time-panel__list';
-    for (const c of cells) {
-      const el = document.createElement('div'); el.className = getTimeCellClass(c, this.prefix); el.textContent = c.text;
-      if (!c.isDisabled) { el.style.cursor = 'pointer'; el.onclick = e => { e.stopPropagation(); onSelect(c.value); }; }
-      list.appendChild(el);
+  private renderTimeWheel(cells: TimeCell[], onSelect: (v: number) => void): HTMLElement {
+    const ITEM_HEIGHT = 36;
+    const VISIBLE_ITEMS = 5;
+    const CENTER_INDEX = 2;
+
+    const col = document.createElement('div');
+    col.className = this.prefix + '-time-panel__wheel';
+    col.style.height = ITEM_HEIGHT * VISIBLE_ITEMS + 'px';
+
+    const wrapper = document.createElement('div');
+    wrapper.className = this.prefix + '-time-panel__wheel-wrapper';
+
+    let selectedIndex = cells.findIndex(c => c.isSelected);
+    if (selectedIndex === -1) selectedIndex = 0;
+
+    let currentOffset = -selectedIndex * ITEM_HEIGHT + CENTER_INDEX * ITEM_HEIGHT;
+    wrapper.style.transform = `translateY(${currentOffset}px)`;
+
+    for (let i = 0; i < cells.length; i++) {
+      const c = cells[i];
+      const el = document.createElement('div');
+      el.className = this.prefix + '-time-panel__wheel-item';
+      el.style.height = ITEM_HEIGHT + 'px';
+      el.style.lineHeight = ITEM_HEIGHT + 'px';
+      el.textContent = c.text;
+      if (c.isDisabled) el.classList.add(this.prefix + '-time-panel__wheel-item--disabled');
+      wrapper.appendChild(el);
     }
-    col.appendChild(list);
+
+    col.appendChild(wrapper);
+
+    const scrollToIndex = (index: number, animate = false) => {
+      currentOffset = -index * ITEM_HEIGHT + CENTER_INDEX * ITEM_HEIGHT;
+      wrapper.style.transition = animate ? 'transform 0.3s ease-out' : 'none';
+      wrapper.style.transform = `translateY(${currentOffset}px)`;
+      updateItemStyles(index);
+    };
+
+    const updateItemStyles = (centerIndex: number) => {
+      for (let i = 0; i < wrapper.children.length; i++) {
+        const item = wrapper.children[i] as HTMLElement;
+        const distance = Math.abs(i - centerIndex);
+        item.classList.remove(this.prefix + '-time-panel__wheel-item--selected', this.prefix + '-time-panel__wheel-item--near', this.prefix + '-time-panel__wheel-item--far');
+        if (distance === 0) item.classList.add(this.prefix + '-time-panel__wheel-item--selected');
+        else if (distance === 1) item.classList.add(this.prefix + '-time-panel__wheel-item--near');
+        else item.classList.add(this.prefix + '-time-panel__wheel-item--far');
+      }
+    };
+
+    updateItemStyles(selectedIndex);
+
+    for (let i = 0; i < wrapper.children.length; i++) {
+      const el = wrapper.children[i] as HTMLElement;
+      const idx = i;
+      el.onclick = (e) => {
+        e.stopPropagation();
+        if (cells[idx].isDisabled) return;
+        scrollToIndex(idx, true);
+        onSelect(cells[idx].value);
+      };
+    }
+
+    col.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? 1 : -1;
+      let newIndex = Math.round((-currentOffset + CENTER_INDEX * ITEM_HEIGHT) / ITEM_HEIGHT) + delta;
+      newIndex = Math.max(0, Math.min(cells.length - 1, newIndex));
+      while (newIndex >= 0 && newIndex < cells.length && cells[newIndex].isDisabled) newIndex += delta;
+      if (newIndex >= 0 && newIndex < cells.length && !cells[newIndex].isDisabled) {
+        scrollToIndex(newIndex, true);
+        onSelect(cells[newIndex].value);
+      }
+    }, { passive: false });
+
+    let startY = 0, startOffset = 0, isDragging = false, lastY = 0, velocity = 0, lastTime = 0;
+
+    const onStart = (e: TouchEvent | MouseEvent) => {
+      isDragging = true;
+      startY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      startOffset = currentOffset;
+      lastY = startY;
+      lastTime = Date.now();
+      velocity = 0;
+      wrapper.style.transition = 'none';
+    };
+
+    const onMove = (e: TouchEvent | MouseEvent) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      const y = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      const deltaY = y - startY;
+      const now = Date.now();
+      if (now - lastTime > 0) velocity = (y - lastY) / (now - lastTime);
+      lastY = y;
+      lastTime = now;
+      currentOffset = startOffset + deltaY;
+      wrapper.style.transform = `translateY(${currentOffset}px)`;
+      updateItemStyles(Math.max(0, Math.min(cells.length - 1, Math.round((-currentOffset + CENTER_INDEX * ITEM_HEIGHT) / ITEM_HEIGHT))));
+    };
+
+    const onEnd = () => {
+      if (!isDragging) return;
+      isDragging = false;
+      let targetIndex = Math.round((-currentOffset - velocity * 150 + CENTER_INDEX * ITEM_HEIGHT) / ITEM_HEIGHT);
+      targetIndex = Math.max(0, Math.min(cells.length - 1, targetIndex));
+      while (targetIndex < cells.length && cells[targetIndex].isDisabled) targetIndex++;
+      if (targetIndex >= cells.length || cells[targetIndex].isDisabled) {
+        targetIndex = Math.round((-currentOffset + CENTER_INDEX * ITEM_HEIGHT) / ITEM_HEIGHT);
+        while (targetIndex >= 0 && cells[targetIndex].isDisabled) targetIndex--;
+      }
+      if (targetIndex >= 0 && targetIndex < cells.length && !cells[targetIndex].isDisabled) {
+        scrollToIndex(targetIndex, true);
+        onSelect(cells[targetIndex].value);
+      }
+    };
+
+    col.addEventListener('touchstart', onStart as EventListener, { passive: true });
+    col.addEventListener('touchmove', onMove as EventListener, { passive: false });
+    col.addEventListener('touchend', onEnd);
+    col.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      onStart(e);
+      const move = (e: MouseEvent) => onMove(e);
+      const up = () => { onEnd(); document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); };
+      document.addEventListener('mousemove', move);
+      document.addEventListener('mouseup', up);
+    });
+
     return col;
   }
 
   private renderFooter(): HTMLElement {
     const opts = this.core.getOptions();
+    const { type } = this.core.getState().panel;
     const locale = opts.locale || {};
     const f = document.createElement('div'); f.className = this.prefix + '-panel-footer';
     if (opts.showToday) {
@@ -284,7 +498,8 @@ export class DOMDatePicker {
       btn.onclick = e => { e.stopPropagation(); this.core.goToday(); };
       f.appendChild(btn);
     }
-    if (opts.showConfirm) {
+    // 时间模式总是显示确定按钮
+    if (opts.showConfirm || type === 'time') {
       const btn = document.createElement('button'); btn.type = 'button'; btn.className = this.prefix + '-panel-footer-btn ' + this.prefix + '-panel-footer-btn--primary';
       btn.textContent = locale.confirm || '确定';
       btn.onclick = e => { e.stopPropagation(); this.core.confirm(); };

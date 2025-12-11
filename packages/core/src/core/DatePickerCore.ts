@@ -87,6 +87,8 @@ const defaultOptions: Required<DatePickerOptions> = {
   secondStep: 1,
   use12Hours: false,
   hideSeconds: false,
+  showTimeSeparator: false,
+  timeCommitMode: 'confirm',
   panelCount: 1,
   locale: defaultLocale as Required<DatePickerLocale>,
   allowClear: true,
@@ -211,6 +213,7 @@ export class DatePickerCore {
       month: 'month',
       quarter: 'quarter',
       year: 'year',
+      time: 'time',
     };
     return mapping[mode] || 'date';
   }
@@ -637,10 +640,18 @@ export class DatePickerCore {
       });
     }
 
+    // 根据 timeCommitMode 决定是否立即触发 change 事件
+    const shouldEmitChange = this.options.timeCommitMode === 'immediate';
+
     // 如果有选中的日期，更新日期的时间部分
     if (this.state.value instanceof Date) {
       const newDate = setTime(this.state.value, { ...this.state.timeValue, ...time });
-      this.setValue(newDate, false);
+      this.setValue(newDate, shouldEmitChange);
+    } else if (this.options.mode === 'time') {
+      // 纯时间模式，创建一个今天的日期并设置时间
+      const today = new Date();
+      const newDate = setTime(today, { ...this.state.timeValue, ...time });
+      this.setValue(newDate, shouldEmitChange);
     }
   }
 
@@ -648,6 +659,10 @@ export class DatePickerCore {
    * 确认选择
    */
   confirm(): void {
+    // 在 confirm 模式下，确认时需要触发 change 事件
+    if (this.options.timeCommitMode === 'confirm' && this.options.mode === 'time') {
+      this.emit('change', this.state.value, this.getDisplayText());
+    }
     this.emit('confirm', this.state.value);
     this.close();
   }
@@ -760,7 +775,7 @@ export class DatePickerCore {
       dateRange: this.options.selectionType === 'range' ? (this.state.value as DateRange) : null,
       hoverDate: this.state.hoverDate,
       weekStart: this.options.weekStart,
-      showWeekNumber: this.options.showWeekNumber,
+      showWeekNumber: this.options.showWeekNumber || this.options.mode === 'week',
       disabledDate: this.options.disabledDate,
       minDate: this.options.minDate,
       maxDate: this.options.maxDate,

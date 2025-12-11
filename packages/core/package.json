@@ -31,8 +31,11 @@
   "author": "LDesign Team",
   "license": "MIT",
   "devDependencies": {
+    "sass": "^1.69.0",
     "tsup": "^8.0.0",
-    "typescript": "^5.3.0",
-    "sass": "^1.69.0"
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "lucide": "^0.559.0"
   }
 }

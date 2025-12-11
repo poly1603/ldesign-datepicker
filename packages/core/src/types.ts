@@ -3,7 +3,7 @@
  */
 
 /** 选择器模式 */
-export type PickerMode = 'date' | 'week' | 'month' | 'quarter' | 'year' | 'datetime';
+export type PickerMode = 'date' | 'week' | 'month' | 'quarter' | 'year' | 'datetime' | 'time';
 
 /** 面板类型 */
 export type PanelType = 'date' | 'week' | 'month' | 'quarter' | 'year' | 'time';
@@ -195,6 +195,10 @@ export interface DatePickerOptions {
   use12Hours?: boolean;
   /** 是否隐藏秒 */
   hideSeconds?: boolean;
+  /** 是否显示时间分隔符（冒号） */
+  showTimeSeparator?: boolean;
+  /** 时间选择提交模式: 'immediate' 实时提交 | 'confirm' 确认后提交 */
+  timeCommitMode?: 'immediate' | 'confirm';
   /** 面板数量（范围选择） */
   panelCount?: number;
   /** 语言/国际化配置 */
