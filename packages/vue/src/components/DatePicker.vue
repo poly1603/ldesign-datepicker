@@ -45,12 +45,16 @@ const props = withDefaults(defineProps<DatePickerProps>(), {
   mode: 'date',
   selectionType: 'single',
   weekStart: 1,
+  format: '',
+  valueFormat: '',
+  showWeekNumber: false,
   showToday: true,
   showConfirm: false,
+  showTime: false,
   allowClear: true,
   disabled: false,
   readonly: false,
-  panelCount: 1,
+  // panelCount 不设置默认值，让核心库自动判断
   classPrefix: 'ldp',
 });
 

@@ -123,6 +123,17 @@ export class DatePickerCore {
   constructor(config: DatePickerConfig = {}) {
     // 合并配置
     this.options = { ...defaultOptions, ...config };
+
+    // 范围选择模式自动设置双面板（除了日期时间范围）
+    if (this.options.selectionType === 'range' && !this.options.showTime && !config.panelCount) {
+      this.options.panelCount = 2;
+    }
+
+    // 日期时间模式自动设置双面板（左侧日期，右侧时间）
+    if (this.options.mode === 'datetime' && !config.panelCount) {
+      this.options.panelCount = 2;
+    }
+
     this.locale = mergeLocale(config.locale);
 
     // 初始化事件处理器
@@ -266,8 +277,9 @@ export class DatePickerCore {
    * 更新状态
    */
   private setState(partial: Partial<DatePickerState>): void {
+    const oldState = { ...this.state };
     this.state = { ...this.state, ...partial };
-    this.emit('stateChange', this.state);
+    this.emit('stateChange', this.state, oldState);
   }
 
   /**
@@ -496,34 +508,31 @@ export class DatePickerCore {
 
     let newRange: DateRange;
 
-    if (activeInput === 'start') {
-      // 选择开始日期
+    if (activeInput === 'start' || !currentRange.start) {
+      // 选择开始日期（或者重新开始选择）
       newRange = { start: date, end: null };
+      this.setValue(newRange);
       this.setState({ activeInput: 'end', hoverDate: null });
     } else {
-      // 选择结束日期
-      if (currentRange.start) {
-        // 确保 start <= end
-        if (compareDate(date, currentRange.start) < 0) {
-          newRange = { start: date, end: currentRange.start };
-        } else {
-          newRange = { start: currentRange.start, end: date };
-        }
-        this.setState({ activeInput: 'start', hoverDate: null });
-
-        // 范围选择完成，如果不需要确认则关闭
-        if (!this.options.showConfirm) {
-          this.setValue(newRange);
-          this.close();
-          return;
-        }
+      // 选择结束日期（activeInput === 'end' && currentRange.start 存在）
+      // 确保 start <= end
+      if (compareDate(date, currentRange.start) < 0) {
+        newRange = { start: date, end: currentRange.start };
       } else {
-        newRange = { start: date, end: null };
-        this.setState({ activeInput: 'end' });
+        newRange = { start: currentRange.start, end: date };
+      }
+
+      // 先设置值（包含 end）
+      this.setValue(newRange);
+
+      // 然后清除 hover 状态
+      this.setState({ activeInput: 'start', hoverDate: null });
+
+      // 范围选择完成，如果不需要确认则关闭
+      if (!this.options.showConfirm) {
+        this.close();
       }
     }
-
-    this.setValue(newRange);
   }
 
   /**
@@ -556,7 +565,8 @@ export class DatePickerCore {
     const weekEnd = endOfWeek(date, this.options.weekStart);
 
     if (this.options.selectionType === 'range') {
-      this.selectRangeDate(date);
+      // 周范围选择：传递周的开始日期
+      this.selectRangeDate(weekStart);
     } else {
       this.setValue(weekStart);
       if (!this.options.showConfirm) {
@@ -641,14 +651,15 @@ export class DatePickerCore {
     }
 
     // 根据 timeCommitMode 决定是否立即触发 change 事件
-    const shouldEmitChange = this.options.timeCommitMode === 'immediate';
+    // datetime 模式下总是立即更新显示
+    const shouldEmitChange = this.options.timeCommitMode === 'immediate' || this.options.mode === 'datetime';
 
     // 如果有选中的日期，更新日期的时间部分
     if (this.state.value instanceof Date) {
       const newDate = setTime(this.state.value, { ...this.state.timeValue, ...time });
       this.setValue(newDate, shouldEmitChange);
-    } else if (this.options.mode === 'time') {
-      // 纯时间模式，创建一个今天的日期并设置时间
+    } else if (this.options.mode === 'time' || this.options.mode === 'datetime') {
+      // 时间模式或日期时间模式，创建一个今天的日期并设置时间
       const today = new Date();
       const newDate = setTime(today, { ...this.state.timeValue, ...time });
       this.setValue(newDate, shouldEmitChange);
@@ -673,7 +684,15 @@ export class DatePickerCore {
    * 设置悬停日期
    */
   setHoverDate(date: Date | null): void {
-    this.setState({ hoverDate: date });
+    // 只在范围选择、正在选择第二个日期、且未完成选择时生效
+    const isRangeMode = this.options.selectionType === 'range';
+    const currentRange = this.state.value as DateRange;
+    const { activeInput } = this.state;
+
+    // 关键条件：activeInput === 'end' 表示正在等待选择第二个日期
+    if (isRangeMode && activeInput === 'end' && currentRange && currentRange.start && !currentRange.end) {
+      this.setState({ hoverDate: date });
+    }
   }
 
   /**

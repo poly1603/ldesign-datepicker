@@ -1,7 +1,7 @@
 /**
  * DOM 渲染器
  */
-import type { DatePickerConfig, DateCell, TimeCell } from '../types';
+import type { DatePickerConfig, DateCell, TimeCell, DatePickerState } from '../types';
 import { DatePickerCore } from './DatePickerCore';
 import { isClickOutside } from '../utils/dom';
 import { getDateCellClass } from '../panels/calendar';
@@ -10,6 +10,7 @@ import { getQuarterCellClass } from '../panels/quarter';
 import { getYearCellClass } from '../panels/year';
 import { getTimeCellClass } from '../panels/time';
 import { getIconSvg } from '../utils/icons';
+import { startOfWeek } from '../utils/date';
 
 export interface DOMRendererOptions extends DatePickerConfig {
   trigger?: HTMLElement | string;
@@ -39,6 +40,24 @@ export class DOMDatePicker {
         this.renderPanel();
       }
     });
+    this.core.on('stateChange', ((newState: DatePickerState, oldState?: DatePickerState) => {
+      // 只在 hoverDate 改变时重新渲染（范围选择预览）
+      if (!oldState) return;
+
+      const oldHover = oldState.hoverDate;
+      const newHover = newState.hoverDate;
+
+      // 比较日期值，而不是对象引用
+      const hoverChanged =
+        (oldHover === null && newHover !== null) ||
+        (oldHover !== null && newHover === null) ||
+        (oldHover !== null && newHover !== null && oldHover.getTime() !== newHover.getTime());
+
+      // 只有 hoverDate 真正改变时才渲染
+      if (hoverChanged && this.core.getState().panel.visible) {
+        this.renderPanel();
+      }
+    }) as any);
     this.core.on('open', () => this.showPopup());
     this.core.on('close', () => this.hidePopup());
   }
@@ -119,18 +138,58 @@ export class DOMDatePicker {
     if (!this.panelEl) return;
     const opts = this.core.getOptions();
     const { type } = this.core.getState().panel;
+    const panelCount = opts.panelCount || 1;
+
     this.panelEl.innerHTML = '';
-    this.panelEl.appendChild(this.renderHeader());
+
+    // 添加日期时间模式的类名
+    if (opts.mode === 'datetime') {
+      this.panelEl.classList.add(this.prefix + '-panel--datetime');
+    } else {
+      this.panelEl.classList.remove(this.prefix + '-panel--datetime');
+    }
+
     const content = document.createElement('div');
     content.className = this.prefix + '-panel-content';
-    content.appendChild(this.renderPanelContent(0));
+
+    // 日期时间模式：头部只在日期面板内
+    if (opts.mode === 'datetime' && type === 'date') {
+      // 左侧：日期面板（带头部）
+      const datePanel = document.createElement('div');
+      datePanel.className = this.prefix + '-panel-body';
+      datePanel.appendChild(this.renderHeader());
+      datePanel.appendChild(this.renderCalendar(0));
+      content.appendChild(datePanel);
+
+      // 右侧：时间面板
+      const timePanel = document.createElement('div');
+      timePanel.className = this.prefix + '-panel-body';
+      timePanel.appendChild(this.renderTimePanel());
+      content.appendChild(timePanel);
+    } else {
+      // 其他模式：头部在顶部
+      this.panelEl.appendChild(this.renderHeader());
+
+      // 渲染多个面板（范围选择时）
+      for (let i = 0; i < panelCount; i++) {
+        content.appendChild(this.renderPanelContent(i));
+      }
+    }
+
     this.panelEl.appendChild(content);
     if (type === 'time' || opts.showToday || opts.showConfirm) this.panelEl.appendChild(this.renderFooter());
   }
 
   private updateInputValue(): void {
     const txt = this.core.getDisplayText();
-    if (this.inputEl) this.inputEl.value = Array.isArray(txt) ? txt[0] : txt;
+    if (this.inputEl) {
+      if (Array.isArray(txt)) {
+        // 范围选择：显示为 "start → end"
+        this.inputEl.value = txt[1] ? `${txt[0]} → ${txt[1]}` : txt[0];
+      } else {
+        this.inputEl.value = txt;
+      }
+    }
   }
 
   private renderHeader(): HTMLElement {
@@ -167,12 +226,27 @@ export class DOMDatePicker {
 
   private renderPanelContent(idx: number): HTMLElement {
     const { type } = this.core.getState().panel;
+    const opts = this.core.getOptions();
     const p = document.createElement('div'); p.className = this.prefix + '-panel-body';
-    if (type === 'date' || type === 'week') p.appendChild(this.renderCalendar(idx));
-    else if (type === 'month') p.appendChild(this.renderMonthPanel(idx));
-    else if (type === 'quarter') p.appendChild(this.renderQuarterPanel(idx));
-    else if (type === 'time') p.appendChild(this.renderTimePanel());
-    else p.appendChild(this.renderYearPanel(idx));
+
+    // 日期时间模式：左侧日期，右侧时间
+    if (opts.mode === 'datetime' && type === 'date') {
+      if (idx === 0) {
+        p.appendChild(this.renderCalendar(idx));
+      } else {
+        p.appendChild(this.renderTimePanel());
+      }
+    } else if (type === 'date' || type === 'week') {
+      p.appendChild(this.renderCalendar(idx));
+    } else if (type === 'month') {
+      p.appendChild(this.renderMonthPanel(idx));
+    } else if (type === 'quarter') {
+      p.appendChild(this.renderQuarterPanel(idx));
+    } else if (type === 'time') {
+      p.appendChild(this.renderTimePanel());
+    } else {
+      p.appendChild(this.renderYearPanel(idx));
+    }
     return p;
   }
 
@@ -241,24 +315,49 @@ export class DOMDatePicker {
     });
 
     if (!cell.isDisabled) {
+      const opts = this.core.getOptions();
+
       if (mode === 'week' && row) {
-        // 周选择模式：鼠标悬停高亮整行
-        el.addEventListener('mouseenter', () => {
-          if (!cell.isWeekSelected) {
-            row.classList.add(this.prefix + '-calendar__row--hover');
-          }
-        });
-        el.addEventListener('mouseleave', () => {
-          row.classList.remove(this.prefix + '-calendar__row--hover');
-        });
+        // 周选择模式
+        if (opts.selectionType === 'range') {
+          // 周范围选择：支持 hover 预览（使用周开始日期）
+          el.addEventListener('mouseenter', () => {
+            const weekStart = startOfWeek(cell.date, opts.weekStart);
+            this.core.setHoverDate(weekStart);
+          });
+          el.addEventListener('mouseleave', () => {
+            this.core.setHoverDate(null);
+          });
+        } else {
+          // 周单选：鼠标悬停高亮整行
+          el.addEventListener('mouseenter', () => {
+            if (!cell.isWeekSelected) {
+              row.classList.add(this.prefix + '-calendar__row--hover');
+            }
+          });
+          el.addEventListener('mouseleave', () => {
+            row.classList.remove(this.prefix + '-calendar__row--hover');
+          });
+        }
       } else {
-        // 日期选择模式：只高亮当前单元格
-        el.addEventListener('mouseenter', () => {
-          if (!cell.isSelected) inner.style.backgroundColor = '#f3f3f3';
-        });
-        el.addEventListener('mouseleave', () => {
-          if (!cell.isSelected) inner.style.backgroundColor = '';
-        });
+        // 日期选择模式
+        if (opts.selectionType === 'range') {
+          // 范围选择模式：设置 hoverDate 以显示范围预览
+          el.addEventListener('mouseenter', () => {
+            this.core.setHoverDate(cell.date);
+          });
+          el.addEventListener('mouseleave', () => {
+            this.core.setHoverDate(null);
+          });
+        } else {
+          // 单选模式：只高亮当前单元格
+          el.addEventListener('mouseenter', () => {
+            if (!cell.isSelected) inner.style.backgroundColor = '#f3f3f3';
+          });
+          el.addEventListener('mouseleave', () => {
+            if (!cell.isSelected) inner.style.backgroundColor = '';
+          });
+        }
       }
     }
     return el;
@@ -266,6 +365,7 @@ export class DOMDatePicker {
 
   private renderMonthPanel(idx: number): HTMLElement {
     const data = this.core.getMonthPanelData(idx);
+    const opts = this.core.getOptions();
     const p = document.createElement('div'); p.className = this.prefix + '-month-panel';
     for (const row of data.rows) {
       const r = document.createElement('div'); r.className = this.prefix + '-month-panel__row';
@@ -273,7 +373,17 @@ export class DOMDatePicker {
         const el = document.createElement('div'); el.className = getMonthCellClass(c, this.prefix);
         const inner = document.createElement('span'); inner.className = this.prefix + '-month-panel__cell-inner'; inner.textContent = c.text;
         el.appendChild(inner);
-        if (!c.isDisabled) { el.style.cursor = 'pointer'; el.onclick = e => { e.stopPropagation(); this.core.selectMonth(c.year, c.month); }; }
+        if (!c.isDisabled) {
+          el.style.cursor = 'pointer';
+          el.onclick = e => { e.stopPropagation(); this.core.selectMonth(c.year, c.month); };
+
+          // 范围选择模式添加 hover 预览
+          if (opts.selectionType === 'range') {
+            const date = new Date(c.year, c.month, 1);
+            el.addEventListener('mouseenter', () => this.core.setHoverDate(date));
+            el.addEventListener('mouseleave', () => this.core.setHoverDate(null));
+          }
+        }
         r.appendChild(el);
       }
       p.appendChild(r);
@@ -283,13 +393,25 @@ export class DOMDatePicker {
 
   private renderQuarterPanel(idx: number): HTMLElement {
     const data = this.core.getQuarterPanelData(idx);
+    const opts = this.core.getOptions();
     const p = document.createElement('div'); p.className = this.prefix + '-quarter-panel';
     const r = document.createElement('div'); r.className = this.prefix + '-quarter-panel__row';
     for (const c of data.quarters) {
       const el = document.createElement('div'); el.className = getQuarterCellClass(c, this.prefix);
       const inner = document.createElement('span'); inner.className = this.prefix + '-quarter-panel__cell-inner'; inner.textContent = c.text;
       el.appendChild(inner);
-      if (!c.isDisabled) { el.style.cursor = 'pointer'; el.onclick = e => { e.stopPropagation(); this.core.selectQuarter(c.year, c.quarter); }; }
+      if (!c.isDisabled) {
+        el.style.cursor = 'pointer';
+        el.onclick = e => { e.stopPropagation(); this.core.selectQuarter(c.year, c.quarter); };
+
+        // 范围选择模式添加 hover 预览
+        if (opts.selectionType === 'range') {
+          const month = (c.quarter - 1) * 3;
+          const date = new Date(c.year, month, 1);
+          el.addEventListener('mouseenter', () => this.core.setHoverDate(date));
+          el.addEventListener('mouseleave', () => this.core.setHoverDate(null));
+        }
+      }
       r.appendChild(el);
     }
     p.appendChild(r);
@@ -298,6 +420,7 @@ export class DOMDatePicker {
 
   private renderYearPanel(idx: number): HTMLElement {
     const data = this.core.getYearPanelData(idx);
+    const opts = this.core.getOptions();
     const p = document.createElement('div'); p.className = this.prefix + '-year-panel';
     for (const row of data.rows) {
       const r = document.createElement('div'); r.className = this.prefix + '-year-panel__row';
@@ -305,7 +428,17 @@ export class DOMDatePicker {
         const el = document.createElement('div'); el.className = getYearCellClass(c, this.prefix);
         const inner = document.createElement('span'); inner.className = this.prefix + '-year-panel__cell-inner'; inner.textContent = c.text;
         el.appendChild(inner);
-        if (!c.isDisabled) { el.style.cursor = 'pointer'; el.onclick = e => { e.stopPropagation(); this.core.selectYear(c.year); }; }
+        if (!c.isDisabled) {
+          el.style.cursor = 'pointer';
+          el.onclick = e => { e.stopPropagation(); this.core.selectYear(c.year); };
+
+          // 范围选择模式添加 hover 预览
+          if (opts.selectionType === 'range') {
+            const date = new Date(c.year, 0, 1);
+            el.addEventListener('mouseenter', () => this.core.setHoverDate(date));
+            el.addEventListener('mouseleave', () => this.core.setHoverDate(null));
+          }
+        }
         r.appendChild(el);
       }
       p.appendChild(r);
@@ -358,8 +491,8 @@ export class DOMDatePicker {
 
   private renderTimeWheel(cells: TimeCell[], onSelect: (v: number) => void): HTMLElement {
     const ITEM_HEIGHT = 36;
-    const VISIBLE_ITEMS = 5;
-    const CENTER_INDEX = 2;
+    const VISIBLE_ITEMS = 7;
+    const CENTER_INDEX = 3;
 
     const col = document.createElement('div');
     col.className = this.prefix + '-time-panel__wheel';
@@ -389,9 +522,14 @@ export class DOMDatePicker {
 
     const scrollToIndex = (index: number, animate = false) => {
       currentOffset = -index * ITEM_HEIGHT + CENTER_INDEX * ITEM_HEIGHT;
-      wrapper.style.transition = animate ? 'transform 0.3s ease-out' : 'none';
+      if (!animate) {
+        wrapper.style.transition = 'none';
+      }
       wrapper.style.transform = `translateY(${currentOffset}px)`;
       updateItemStyles(index);
+      if (!animate) {
+        setTimeout(() => wrapper.style.transition = '', 0);
+      }
     };
 
     const updateItemStyles = (centerIndex: number) => {
@@ -439,6 +577,7 @@ export class DOMDatePicker {
       lastY = startY;
       lastTime = Date.now();
       velocity = 0;
+      wrapper.classList.add(this.prefix + '-time-panel__wheel-wrapper--dragging');
       wrapper.style.transition = 'none';
     };
 
@@ -459,6 +598,7 @@ export class DOMDatePicker {
     const onEnd = () => {
       if (!isDragging) return;
       isDragging = false;
+      wrapper.classList.remove(this.prefix + '-time-panel__wheel-wrapper--dragging');
       let targetIndex = Math.round((-currentOffset - velocity * 150 + CENTER_INDEX * ITEM_HEIGHT) / ITEM_HEIGHT);
       targetIndex = Math.max(0, Math.min(cells.length - 1, targetIndex));
       while (targetIndex < cells.length && cells[targetIndex].isDisabled) targetIndex++;

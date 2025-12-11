@@ -156,3 +156,22 @@
     }
   }
 }
+
+// 日期时间选择的布局
+.ldp-panel--datetime {
+  .ldp-panel-content {
+    display: flex;
+    gap: 0;
+  }
+
+  .ldp-panel-body {
+    &:first-child {
+      border-right: 1px solid $ldp-border-color;
+      padding-right: $ldp-spacing-4;
+    }
+    
+    &:last-child {
+      padding-left: $ldp-spacing-4;
+    }
+  }
+}

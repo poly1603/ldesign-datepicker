@@ -82,6 +82,18 @@
     .ldp-calendar__cell-inner {
       color: $ldp-text-color-placeholder;
     }
+    
+    // 其他月份的日期不显示范围背景
+    &.ldp-calendar__cell--in-range,
+    &.ldp-calendar__cell--range-start,
+    &.ldp-calendar__cell--range-end {
+      background-color: transparent;
+      
+      .ldp-calendar__cell-inner {
+        background-color: transparent;
+        color: $ldp-text-color-placeholder;
+      }
+    }
   }
 
   &--today {

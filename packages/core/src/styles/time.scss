@@ -5,7 +5,7 @@
 @use 'variables' as *;
 
 $wheel-item-height: 36px;
-$wheel-visible-items: 5;
+$wheel-visible-items: 7;
 
 .ldp-time-panel {
   padding: $ldp-spacing-3;
@@ -19,7 +19,7 @@ $wheel-visible-items: 5;
   justify-content: center;
   position: relative;
   gap: $ldp-spacing-1;
-  min-height: 180px;
+  min-height: calc($wheel-item-height * $wheel-visible-items);
 }
 
 // 选中区域指示器（中间高亮区域）
@@ -54,7 +54,7 @@ $wheel-visible-items: 5;
 // 滚轮列
 .ldp-time-panel__wheel {
   width: 60px;
-  height: 180px !important; // 36px * 5
+  height: calc($wheel-item-height * $wheel-visible-items) !important;
   overflow: hidden;
   position: relative;
   z-index: 1;
@@ -91,6 +91,12 @@ $wheel-visible-items: 5;
 // 滚轮内容包装器
 .ldp-time-panel__wheel-wrapper {
   will-change: transform;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  
+  // 拖拽时禁用动画
+  &--dragging {
+    transition: none;
+  }
 }
 
 // 滚轮选项

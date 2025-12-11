@@ -193,7 +193,9 @@ function generateDateCells(options: GenerateDateCellsOptions): DateCell[][] {
       const isSelected = isDateSelected(date, selectedDates);
 
       // 判断是否在范围内
-      const { isInRange, isRangeStart, isRangeEnd } = getRangeStatus(date, range);
+      // 周模式下，使用周的开始日期进行范围判断
+      const dateForRange = isWeekMode ? startOfWeek(date, weekStart) : date;
+      const { isInRange, isRangeStart, isRangeEnd } = getRangeStatus(dateForRange, range);
 
       // 判断是否禁用
       const isDisabled = isDateDisabled(date, disabledDate, minDate, maxDate);
